@@ -6,11 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Welcome to Frosty Bay!</title>
-  <meta name="description" content="This is a sample post. We’re getting there soon. You shouldn’t be reading this. Kek.">
+  <title>JS - TCP Server with Node.js - [pt. 1]</title>
+  <meta name="description" content="Topics we will try to do in this series:">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://frostybay.com/articles/welcome-to-frostybay">
+  <link rel="canonical" href="http://frostybay.com/articles/tcp-server-with-nodejs">
   <link rel="alternate" type="application/rss+xml" title="Frosty Bay" href="http://frostybay.com/feed.xml">
 </head>
 
@@ -58,32 +58,52 @@
       <div class="wrapper">
         <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
+  
+    <div class="post-cover">
+      <img src="/img/posts/cover/node.png" />    
+    </div>
+  
+
+  <p class="post-back">
+    <a href="/">&laquo; Back to articles </a>
+  </p>
+
   <header class="post-header">
-    <h1 class="post-title" itemprop="name headline">Welcome to Frosty Bay!</h1>
+    <h1 class="post-title" itemprop="name headline">JS - TCP Server with Node.js - [pt. 1]</h1>
     <p class="post-meta"><time datetime="2016-08-15T00:12:30-03:00" itemprop="datePublished">Aug 15, 2016</time></p>
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <p>This is a sample post. We’re getting there soon. You shouldn’t be reading this. Kek.</p>
+    <p>Topics we will try to do in this series:</p>
 
-<p>Some sample coding, for future reference, below:</p>
+<ul>
+  <li>Setup and configure a Node.js application</li>
+  <li>Understand how TCP works</li>
+  <li>Handle incoming connections and messages</li>
+  <li>Manage our clients</li>
+  <li>Broadcast events to clients</li>
+</ul>
+
+<p>This series will be done in paralel with our other series “<a href="#">C# - Unity3D TCP Client</a>”, so we will be referencing material from there many times but if you already know how to write your own client in your favorite language, you won’t need it.</p>
 
 <hr />
 
-<p>You’ll find this post in your <code class="highlighter-rouge">_posts</code> directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run <code class="highlighter-rouge">jekyll serve</code>, which launches a web server and auto-regenerates your site when a file is updated.</p>
+<h2 id="setting-up">Setting up</h2>
 
-<p>To add new posts, simply add a file in the <code class="highlighter-rouge">_posts</code> directory that follows the convention <code class="highlighter-rouge">YYYY-MM-DD-name-of-post.ext</code> and includes the necessary front matter. Take a look at the source for this post to get an idea about how it works.</p>
+<p>For this post I am going to assume that you already have the lastest version of <a href="https://nodejs.org/en/">Node.js</a> installed and working, and the command <code class="highlighter-rouge">node</code> is avaliable in your command line. You can test this with <code class="highlighter-rouge">node -v</code>. If the output was &gt;= v4.2.6, you are probably safe to go ahead, if not, I recommend that you upgrade your Node.js.</p>
 
-<p>Jekyll also offers powerful support for code snippets:</p>
+<h3 id="to-be-continued">to be continued…</h3>
 
-<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">print_hi</span><span class="p">(</span><span class="s2">"Tom"</span><span class="p">);</span>
+<!--
 
-<span class="kd">function</span> <span class="nx">print_hi</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Hi, "</span> <span class="o">+</span> <span class="nx">name</span><span class="p">);</span>
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">print_this</span><span class="p">(</span><span class="s2">"Hello World"</span><span class="p">);</span>
+
+<span class="kd">function</span> <span class="nx">print_this</span><span class="p">(</span><span class="nx">txt</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">txt</span><span class="p">);</span>
 <span class="p">}</span>
-<span class="c1">//=&gt; prints 'Hi, Tom' to console.</span></code></pre></figure>
+<span class="c1">//=&gt; prints 'Hello World' to console.</span></code></pre></figure>
 
-<p>Check out the <a href="http://jekyllrb.com/docs/home">Jekyll docs</a> for more info on how to get the most out of Jekyll. File all bugs/feature requests at <a href="https://github.com/jekyll/jekyll">Jekyll’s GitHub repo</a>. If you have questions, you can ask them on <a href="https://talk.jekyllrb.com/">Jekyll Talk</a>.</p>
+-->
 
 
   </div>
@@ -99,8 +119,8 @@
 <script>
 
 var disqus_config = function () {
-    this.page.url = '/articles/welcome-to-frostybay';  // Replace PAGE_URL with your page's canonical URL variable
-    this.page.identifier = '/articles/welcome-to-frostybay'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    this.page.url = 'http://frostybay.com' + '/articles/tcp-server-with-nodejs';  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = '/articles/tcp-server-with-nodejs'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
 };
 (function() { // DON'T EDIT BELOW THIS LINE
     var d = document, s = d.createElement('script');

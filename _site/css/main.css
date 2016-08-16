@@ -11,7 +11,7 @@ dl, dd, ol, ul, figure {
  * Basic styling
  */
 body {
-  font: 400 16px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: 400 16px/1.5 "Helvetica Neue", Helvetica, "Roboto", Arial, sans-serif;
   color: #111;
   background-color: #F9F9F9;
   -webkit-text-size-adjust: 100%;
@@ -463,6 +463,13 @@ pre {
 
 .site-header {
   border-top-color: #00B0CE; }
+
+.post-cover {
+  text-align: center; }
+  .post-cover img {
+    height: 100px;
+    margin: 50px;
+    margin-top: 0; }
 
 .post-content hr {
   margin: 20px 0px;
