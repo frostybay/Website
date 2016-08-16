@@ -14,7 +14,7 @@ Topics we will try to do in this series:
 * Manage our clients
 * Broadcast events to clients
 
-This series will be done in paralel with our other series "[C# - Unity3D TCP Client][unity-tcp-series]", so we will be referencing material from there many times but if you already know how to write your own client in your favorite language, you won't need it.
+This series will be done in paralel with our other series "[C# - Unity3D TCP Client][unity-tcp-series]", so we will be referencing material from there many times. But, if you already know how to write your own client in your favorite language, you won't need it.
 
 ----
 
