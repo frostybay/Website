@@ -21,4 +21,8 @@ layout: default
 	  {% endif %}
 	</div>
 
+  {% if site.disqus_enable %}
+    {% include disqus_comments.html %}
+  {% endif %}
+
 </article>
