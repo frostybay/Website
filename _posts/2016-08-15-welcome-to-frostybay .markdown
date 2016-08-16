@@ -1,8 +1,8 @@
 ---
 layout: post
 title:  "Welcome to Frosty Bay!" 
-date: 2016-08-15T00:12:30-03:00
-categories: articles
+date: 2016-08-14T00:12:30-03:00
+categories: blog sample
 ---
 This is a sample post. We're getting there soon. You shouldn't be reading this. Kek.
 

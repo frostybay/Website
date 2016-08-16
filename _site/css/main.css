@@ -462,4 +462,8 @@ pre {
   float: left; }
 
 .site-header {
-  border-top-color: #0092B6; }
+  border-top-color: #00B0CE; }
+
+.post-content hr {
+  margin: 20px 0px;
+  border-color: #efefef; }
