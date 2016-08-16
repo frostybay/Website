@@ -4,6 +4,7 @@ title:  "JS - TCP Server with Node.js - [pt. 1]"
 date: 2016-08-15T00:12:30-03:00
 categories: javascript node-js server programming
 cover_picture: node.png # this picture is inside /img/posts/cover
+author: "Richard Eitz"
 ---
 
 Topics we will try to do in this series:
