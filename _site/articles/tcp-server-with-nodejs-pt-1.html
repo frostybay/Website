@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>JS - TCP Server with Node.js - [pt. 1]</title>
+  <title>Tutorial: TCP Server with Node.js - [pt. 1]</title>
   <meta name="description" content="Topics we will be doing in this series:">
 
   <link rel="stylesheet" href="/css/main.css">
@@ -69,7 +69,7 @@
   </p>
 
   <header class="post-header">
-    <h1 class="post-title" itemprop="name headline">JS - TCP Server with Node.js - [pt. 1]</h1>
+    <h1 class="post-title" itemprop="name headline">Tutorial: TCP Server with Node.js - [pt. 1]</h1>
     <p class="post-meta"><time datetime="2016-08-15T00:12:30-03:00" itemprop="datePublished">Aug 15, 2016</time> • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Richard Eitz</span></span></p>
   </header>
 
@@ -84,7 +84,7 @@
   <li>Broadcast events to clients</li>
 </ul>
 
-<p>This series will be done in paralel with our other series “<a href="#">C# - Unity3D TCP Client</a>”, so we will be referencing material from there many times. But, if you already know how to write your own client in your favorite language, you won’t need it.</p>
+<p>This series will be done in paralel with our other series “<a href="#">C# - Unity3D TCP Client</a>”, so it’s possible that we will be referencing material from there sometimes. But, if you already know how to write your own client in your favorite language, you won’t need it because all the tests can be done with telnet.</p>
 
 <hr />
 
@@ -92,9 +92,28 @@
 
 <p>For this post I am going to assume that you already have the lastest version of <a href="https://nodejs.org/en/">Node.js</a> installed and working, and the command <code class="highlighter-rouge">node</code> is avaliable in your command line. You can test this with <code class="highlighter-rouge">node -v</code>. If the output was &gt;= v4.2.6, you are probably safe to go ahead, if not, I recommend that you upgrade your Node.js.</p>
 
-<h3 id="to-be-continued">to be continued…</h3>
+<h3 id="about-node">About Node</h3>
 
-<p>This is a sample code that you can build on while this tutorial isn’t finished, in case you are here already…</p>
+<p>Node.js has a very neat feature that enables the possibilty of importing code from other <strong>.js</strong> files, this is done through the <code class="highlighter-rouge">require</code> function. Using this we can separate the roles of our application in different classes and files. To use an object, class, function or variable from another script in the same folder, you can use the following snippet:</p>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">yourClass</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./yourClass'</span><span class="p">);</span></code></pre></figure>
+
+<h3 id="the-tcp-protocol">The TCP protocol</h3>
+
+<p>By <a href="https://en.wikipedia.org/wiki/Transmission_Control_Protocol">Wikipedia</a>, Transmission Control Protocol:</p>
+
+<blockquote>
+  <p>… provides reliable, ordered, and error-checked delivery of a stream of octets between applications running on hosts communicating over an IP network.</p>
+</blockquote>
+
+<p>This means that the protocol can guarantee that what you send through the network and over IP is always arrived at the other end. TCP also has the special feature of keeping the connections opened for later referece and usage. An usual connection flow:</p>
+
+<ul>
+  <li>Client connects to the server at an IP Address and a Port (Ex: 127.0.0.1:3000)</li>
+  <li>Server accepts the connection, now the client can keep a reference to the pipe that goes to the server and the server can also do the same.</li>
+  <li>Both send messages to each other.</li>
+  <li>The connection can be closed by any side.</li>
+</ul>
 
 <h3 id="serverjs">Server.js</h3>
 
@@ -165,7 +184,7 @@
     <span class="k">if</span> <span class="p">(</span><span class="nx">callback</span> <span class="o">!=</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">this</span><span class="p">.</span><span class="nx">connection</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'listening'</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>  
     <span class="p">}</span>
-    
+
   <span class="p">};</span>
 
   <span class="cm">/*

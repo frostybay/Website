@@ -6,12 +6,12 @@
 </description>
     <link>http://frostybay.com/</link>
     <atom:link href="http://frostybay.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 18 Aug 2016 00:48:35 -0300</pubDate>
-    <lastBuildDate>Thu, 18 Aug 2016 00:48:35 -0300</lastBuildDate>
+    <pubDate>Thu, 18 Aug 2016 01:17:24 -0300</pubDate>
+    <lastBuildDate>Thu, 18 Aug 2016 01:17:24 -0300</lastBuildDate>
     <generator>Jekyll v3.2.1</generator>
     
       <item>
-        <title>JS - TCP Server with Node.js - [pt. 1]</title>
+        <title>Tutorial: TCP Server with Node.js - [pt. 1]</title>
         <description>&lt;p&gt;Topics we will be doing in this series:&lt;/p&gt;
 
 &lt;ul&gt;
@@ -22,7 +22,7 @@
   &lt;li&gt;Broadcast events to clients&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;This series will be done in paralel with our other series “&lt;a href=&quot;#&quot;&gt;C# - Unity3D TCP Client&lt;/a&gt;”, so we will be referencing material from there many times. But, if you already know how to write your own client in your favorite language, you won’t need it.&lt;/p&gt;
+&lt;p&gt;This series will be done in paralel with our other series “&lt;a href=&quot;#&quot;&gt;C# - Unity3D TCP Client&lt;/a&gt;”, so it’s possible that we will be referencing material from there sometimes. But, if you already know how to write your own client in your favorite language, you won’t need it because all the tests can be done with telnet.&lt;/p&gt;
 
 &lt;hr /&gt;
 
@@ -30,9 +30,28 @@
 
 &lt;p&gt;For this post I am going to assume that you already have the lastest version of &lt;a href=&quot;https://nodejs.org/en/&quot;&gt;Node.js&lt;/a&gt; installed and working, and the command &lt;code class=&quot;highlighter-rouge&quot;&gt;node&lt;/code&gt; is avaliable in your command line. You can test this with &lt;code class=&quot;highlighter-rouge&quot;&gt;node -v&lt;/code&gt;. If the output was &amp;gt;= v4.2.6, you are probably safe to go ahead, if not, I recommend that you upgrade your Node.js.&lt;/p&gt;
 
-&lt;h3 id=&quot;to-be-continued&quot;&gt;to be continued…&lt;/h3&gt;
+&lt;h3 id=&quot;about-node&quot;&gt;About Node&lt;/h3&gt;
 
-&lt;p&gt;This is a sample code that you can build on while this tutorial isn’t finished, in case you are here already…&lt;/p&gt;
+&lt;p&gt;Node.js has a very neat feature that enables the possibilty of importing code from other &lt;strong&gt;.js&lt;/strong&gt; files, this is done through the &lt;code class=&quot;highlighter-rouge&quot;&gt;require&lt;/code&gt; function. Using this we can separate the roles of our application in different classes and files. To use an object, class, function or variable from another script in the same folder, you can use the following snippet:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;yourClass&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'./yourClass'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h3 id=&quot;the-tcp-protocol&quot;&gt;The TCP protocol&lt;/h3&gt;
+
+&lt;p&gt;By &lt;a href=&quot;https://en.wikipedia.org/wiki/Transmission_Control_Protocol&quot;&gt;Wikipedia&lt;/a&gt;, Transmission Control Protocol:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;… provides reliable, ordered, and error-checked delivery of a stream of octets between applications running on hosts communicating over an IP network.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;This means that the protocol can guarantee that what you send through the network and over IP is always arrived at the other end. TCP also has the special feature of keeping the connections opened for later referece and usage. An usual connection flow:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Client connects to the server at an IP Address and a Port (Ex: 127.0.0.1:3000)&lt;/li&gt;
+  &lt;li&gt;Server accepts the connection, now the client can keep a reference to the pipe that goes to the server and the server can also do the same.&lt;/li&gt;
+  &lt;li&gt;Both send messages to each other.&lt;/li&gt;
+  &lt;li&gt;The connection can be closed by any side.&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;h3 id=&quot;serverjs&quot;&gt;Server.js&lt;/h3&gt;
 
@@ -103,7 +122,7 @@
     &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;callback&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;undefined&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
       &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;connection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;on&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'listening'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;callback&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;  
     &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    
+
   &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
 
   &lt;span class=&quot;cm&quot;&gt;/*

@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "JS - TCP Server with Node.js - [pt. 1]" 
+title:  "Tutorial: TCP Server with Node.js - [pt. 1]" 
 date: 2016-08-15T00:12:30-03:00
 categories: javascript node-js server programming
 cover_picture: node.png # this picture is inside /img/posts/cover
@@ -15,7 +15,7 @@ Topics we will be doing in this series:
 * Manage our clients
 * Broadcast events to clients
 
-This series will be done in paralel with our other series "[C# - Unity3D TCP Client][unity-tcp-series]", so we will be referencing material from there many times. But, if you already know how to write your own client in your favorite language, you won't need it.
+This series will be done in paralel with our other series "[C# - Unity3D TCP Client][unity-tcp-series]", so it's possible that we will be referencing material from there sometimes. But, if you already know how to write your own client in your favorite language, you won't need it because all the tests can be done with telnet.
 
 ----
 
@@ -24,10 +24,27 @@ This series will be done in paralel with our other series "[C# - Unity3D TCP Cli
 
 For this post I am going to assume that you already have the lastest version of [Node.js][node] installed and working, and the command `node` is avaliable in your command line. You can test this with `node -v`. If the output was >= v4.2.6, you are probably safe to go ahead, if not, I recommend that you upgrade your Node.js.
 
+### About Node
 
-### to be continued...
+Node.js has a very neat feature that enables the possibilty of importing code from other **.js** files, this is done through the `require` function. Using this we can separate the roles of our application in different classes and files. To use an object, class, function or variable from another script in the same folder, you can use the following snippet:
 
-This is a sample code that you can build on while this tutorial isn't finished, in case you are here already...
+{% highlight js %}
+var yourClass = require('./yourClass');
+{% endhighlight %}
+
+### The TCP protocol
+
+By [Wikipedia][tcp-wikipedia], Transmission Control Protocol:
+
+> ... provides reliable, ordered, and error-checked delivery of a stream of octets between applications running on hosts communicating over an IP network. 
+
+This means that the protocol can guarantee that what you send through the network and over IP is always arrived at the other end. TCP also has the special feature of keeping the connections opened for later referece and usage. An usual connection flow:
+
+* Client connects to the server at an IP Address and a Port (Ex: 127.0.0.1:3000)
+* Server accepts the connection, now the client can keep a reference to the pipe that goes to the server and the server can also do the same.
+* Both send messages to each other.
+* The connection can be closed by any side.
+
 
 ### Server.js
 {% highlight js %}
@@ -98,7 +115,7 @@ const Server = function (port, address) {
     if (callback != undefined) {
       this.connection.on('listening', callback);  
     }
-    
+
   };
 
   /*
@@ -156,3 +173,5 @@ server.start(function () {
 
 [node]: https://nodejs.org/en/
 [unity-tcp-series]: #
+[tcp-wikipedia]: https://en.wikipedia.org/wiki/Transmission_Control_Protocol
+[udp-wikipedia]: #
