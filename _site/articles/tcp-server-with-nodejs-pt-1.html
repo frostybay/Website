@@ -96,112 +96,126 @@
 
 <p>This is a sample code that you can build on while this tutorial isn’t finished, in case you are here already…</p>
 
-<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// TcpServer.js</span>
+<h3 id="serverjs">Server.js</h3>
 
-<span class="kd">var</span> <span class="nx">TcpServer</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">port</span><span class="p">,</span> <span class="nx">address</span><span class="p">)</span> <span class="p">{</span>
-  <span class="c1">// Load the TCP Library</span>
-  <span class="kr">const</span> <span class="nx">net</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'net'</span><span class="p">);</span>
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// Load the TCP Library</span>
+<span class="kr">const</span> <span class="nx">net</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'net'</span><span class="p">);</span>
+<span class="c1">// importing Client class</span>
+<span class="kr">const</span> <span class="nx">Client</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./Client'</span><span class="p">);</span>
+
+<span class="kr">const</span> <span class="nx">Server</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">port</span><span class="p">,</span> <span class="nx">address</span><span class="p">)</span> <span class="p">{</span>
+  
+  <span class="c1">// Currently connected clients</span>
+  <span class="kd">var</span> <span class="nx">clients</span> <span class="o">=</span> <span class="p">[];</span>
+
   <span class="k">this</span><span class="p">.</span><span class="nx">port</span> <span class="o">=</span> <span class="nx">port</span> <span class="o">||</span> <span class="mi">5000</span><span class="p">;</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">address</span> <span class="o">=</span> <span class="nx">address</span> <span class="o">||</span> <span class="s1">'localhost'</span><span class="p">;</span>
   
-  <span class="kd">var</span> <span class="nx">clients</span> <span class="o">=</span> <span class="p">[];</span>
-
-  <span class="kd">var</span> <span class="nx">events</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">'clientConnected'</span> <span class="p">:</span> <span class="kd">function</span><span class="p">(){</span> <span class="k">return</span> <span class="kc">true</span> <span class="p">},</span>
-    <span class="s1">'message'</span> <span class="err">:</span> <span class="kd">function</span><span class="p">(){},</span>
-    <span class="s1">'clientDisconnected'</span> <span class="err">:</span> <span class="kd">function</span><span class="p">(){},</span>
+  <span class="c1">// Broadcast messages to the network</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">broadcast</span> <span class="o">=</span> <span class="p">(</span><span class="nx">message</span><span class="p">,</span> <span class="nx">clientSender</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">clients</span><span class="p">.</span><span class="nx">forEach</span><span class="p">((</span><span class="nx">client</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="c1">// Sender doesn't receive it's own message</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">clientSender</span> <span class="o">!=</span> <span class="kc">undefined</span> <span class="o">&amp;&amp;</span> <span class="nx">client</span> <span class="o">===</span> <span class="nx">clientSender</span><span class="p">)</span>
+        <span class="k">return</span><span class="p">;</span>
+      <span class="nx">client</span><span class="p">.</span><span class="nx">receiveMessage</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
+    <span class="p">});</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">message</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/</span><span class="se">\n</span><span class="sr">+$/</span><span class="p">,</span> <span class="s2">""</span><span class="p">));</span>
   <span class="p">};</span>
 
-  <span class="k">this</span><span class="p">.</span><span class="nx">on</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="nx">event</span> <span class="k">in</span> <span class="nx">events</span><span class="p">))</span>
-      <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">"This event doesn't exist: "</span> <span class="o">+</span> <span class="nx">event</span><span class="p">);</span>
-    <span class="nx">events</span><span class="p">[</span><span class="nx">event</span><span class="p">]</span> <span class="o">=</span> <span class="nx">callback</span><span class="p">;</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
-  <span class="p">};</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">start</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
 
-  <span class="k">this</span><span class="p">.</span><span class="nx">serverBroadcast</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">broadcast</span><span class="p">(</span><span class="kc">undefined</span><span class="p">,</span> <span class="s2">"SERVER: "</span> <span class="o">+</span> <span class="nx">message</span> <span class="o">+</span> <span class="s2">"\n"</span><span class="p">);</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
-  <span class="p">}</span>
+    <span class="cm">/*
+     * Creating New Server
+     * The callback get's called when a new client joins the server
+    */</span> 
+    <span class="kd">var</span> <span class="nx">server</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">connection</span> <span class="o">=</span> <span class="nx">net</span><span class="p">.</span><span class="nx">createServer</span><span class="p">((</span><span class="nx">socket</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      
+      <span class="kd">var</span> <span class="nx">client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Client</span><span class="p">(</span><span class="nx">socket</span><span class="p">);</span>
 
-  <span class="k">this</span><span class="p">.</span><span class="nx">clientBroadcast</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">broadcast</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">client</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="s2">" SENT: "</span> <span class="o">+</span> <span class="nx">message</span><span class="p">);</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
-  <span class="p">}</span>
+      <span class="c1">// Validation, if the client is valid</span>
+      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">validateClient</span><span class="p">(</span><span class="nx">client</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nx">client</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="nx">destroy</span><span class="p">();</span>
+        <span class="k">return</span><span class="p">;</span>
+      <span class="p">}</span>
+      <span class="c1">// Broadcast the new connection</span>
+      <span class="nx">server</span><span class="p">.</span><span class="nx">broadcast</span><span class="p">(</span><span class="nx">client</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="s2">" connected.\n"</span><span class="p">,</span> <span class="nx">client</span><span class="p">);</span>
+      <span class="c1">// Storing client for later usage</span>
+      <span class="nx">clients</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">client</span><span class="p">);</span>
 
-  <span class="kd">function</span> <span class="nx">broadcast</span> <span class="p">(</span><span class="nx">clientSender</span><span class="p">,</span> <span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">clients</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">client</span><span class="p">)</span> <span class="p">{</span>
-        <span class="c1">// Don't want to send it to sender</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nx">client</span> <span class="o">===</span> <span class="nx">clientSender</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
-        <span class="nx">client</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
+      <span class="c1">// Triggered on message received by this client</span>
+      <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'data'</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span> 
+        <span class="c1">// Broadcasting the message</span>
+        <span class="nx">server</span><span class="p">.</span><span class="nx">broadcast</span><span class="p">(</span><span class="nx">client</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="s2">" -&gt; "</span> <span class="o">+</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">client</span><span class="p">);</span>
       <span class="p">});</span>
-    <span class="p">};</span>    
+      
+      <span class="c1">// Triggered when this client disconnects</span>
+      <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'end'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="c1">// Removing the client from the list</span>
+        <span class="nx">clients</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">clients</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">client</span><span class="p">),</span> <span class="mi">1</span><span class="p">);</span>
+        <span class="c1">// Broadcasting that this player left</span>
+        <span class="nx">server</span><span class="p">.</span><span class="nx">broadcast</span><span class="p">(</span><span class="nx">client</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="s2">" disconnected.\n"</span><span class="p">);</span>
+      <span class="p">});</span>
 
-  <span class="k">this</span><span class="p">.</span><span class="nx">connection</span> <span class="o">=</span> <span class="nx">net</span><span class="p">.</span><span class="nx">createServer</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
-
-    <span class="kd">var</span> <span class="nx">client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Client</span><span class="p">(</span><span class="nx">socket</span><span class="p">);</span>
-    <span class="c1">// validate</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">events</span><span class="p">[</span><span class="s1">'clientConnected'</span><span class="p">](</span><span class="nx">client</span><span class="p">))</span> <span class="p">{</span>
-      <span class="nx">client</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="nx">destroy</span><span class="p">();</span>
-      <span class="k">return</span><span class="p">;</span>
+    <span class="p">});</span>
+    <span class="c1">// starting the server</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">connection</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">port</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">address</span><span class="p">);</span>
+    
+    <span class="c1">// setuping the callback of the start function</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">callback</span> <span class="o">!=</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">connection</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'listening'</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>  
     <span class="p">}</span>
+    
+  <span class="p">};</span>
 
-    <span class="c1">// new client!</span>
-    <span class="nx">clients</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">client</span><span class="p">);</span>
-
-    <span class="c1">// setup events</span>
-    <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'data'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span> 
-      <span class="nx">events</span><span class="p">[</span><span class="s1">'message'</span><span class="p">](</span><span class="nx">client</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
-    <span class="p">});</span>
-    <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'end'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-      <span class="nx">clients</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">clients</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">client</span><span class="p">),</span> <span class="mi">1</span><span class="p">);</span>
-        <span class="nx">events</span><span class="p">[</span><span class="s1">'clientDisconnected'</span><span class="p">](</span><span class="nx">client</span><span class="p">);</span>
-    <span class="p">});</span>
-
-  <span class="p">}).</span><span class="nx">listen</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">port</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">address</span><span class="p">);</span>
-
+  <span class="cm">/*
+   * An example function: Validating the client
+   */</span>
+  <span class="kd">function</span> <span class="nx">validateClient</span><span class="p">(</span><span class="nx">client</span><span class="p">)</span>  <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">client</span><span class="p">.</span><span class="nx">isLocalhost</span><span class="p">();</span>
+  <span class="p">}</span>
+  
   <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
 <span class="p">};</span>
 
-<span class="c1">// Client.js</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Server</span><span class="p">;</span></code></pre></figure>
 
-<span class="kd">var</span> <span class="nx">Client</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
+<h3 id="clientjs">Client.js</h3>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="kr">const</span> <span class="nx">Client</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">address</span> <span class="o">=</span> <span class="nx">socket</span><span class="p">.</span><span class="nx">remoteAddress</span><span class="p">;</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">port</span>    <span class="o">=</span> <span class="nx">socket</span><span class="p">.</span><span class="nx">remotePort</span><span class="p">;</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">name</span>    <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">address</span> <span class="o">+</span> <span class="s2">":"</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">port</span><span class="p">;</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">socket</span>  <span class="o">=</span> <span class="nx">socket</span><span class="p">;</span>
 
-  <span class="k">this</span><span class="p">.</span><span class="nx">send</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">receiveMessage</span> <span class="o">=</span> <span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
   <span class="p">};</span>
 
-  <span class="k">this</span><span class="p">.</span><span class="nx">isLocalhost</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">isLocalhost</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">address</span> <span class="o">==</span> <span class="s2">"127.0.0.1"</span> <span class="o">||</span> <span class="k">this</span><span class="p">.</span><span class="nx">address</span> <span class="o">==</span> <span class="s2">"localhost"</span><span class="p">;</span>
-  <span class="p">}</span>
+  <span class="p">};</span>  
 <span class="p">};</span>
 
-<span class="c1">// main.js</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Client</span><span class="p">;</span></code></pre></figure>
 
-<span class="kd">var</span> <span class="nx">server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">TcpServer</span><span class="p">(</span><span class="mi">46131</span><span class="p">,</span> <span class="s2">"127.0.0.1"</span><span class="p">);</span>
+<h3 id="initjs">init.js</h3>
 
-<span class="nx">server</span>
-  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">"clientConnected"</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">client</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">client</span><span class="p">.</span><span class="nx">isLocalhost</span><span class="p">())</span> <span class="p">{</span>
-      <span class="nx">server</span><span class="p">.</span><span class="nx">serverBroadcast</span><span class="p">(</span><span class="nx">client</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="s2">" connected."</span><span class="p">);</span>
-      <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="kc">false</span><span class="p">;</span> 
-    <span class="p">}</span>   
-  <span class="p">})</span>
-  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">"message"</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">server</span><span class="p">.</span><span class="nx">clientBroadcast</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">message</span><span class="p">);</span>
-  <span class="p">})</span>
-  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">"clientDisconnected"</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">client</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">server</span><span class="p">.</span><span class="nx">serverBroadcast</span><span class="p">(</span><span class="nx">client</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="s2">" disconnected."</span><span class="p">);</span>
-  <span class="p">});</span>
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// importing Server class</span>
+<span class="kr">const</span> <span class="nx">Server</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./Server'</span><span class="p">);</span>
 
-<span class="nx">server</span><span class="p">.</span><span class="nx">connection</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'listening'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Chat server running at port "</span> <span class="o">+</span> <span class="nx">server</span><span class="p">.</span><span class="nx">port</span> <span class="o">+</span> <span class="s2">"\n"</span><span class="p">);</span>
+<span class="c1">// Our configuration</span>
+<span class="kr">const</span> <span class="nx">PORT</span> <span class="o">=</span> <span class="mi">46141</span><span class="p">;</span>
+<span class="kr">const</span> <span class="nx">ADDRESS</span> <span class="o">=</span> <span class="s2">"127.0.0.1"</span>
+
+<span class="kd">var</span> <span class="nx">server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Server</span><span class="p">(</span><span class="nx">PORT</span><span class="p">,</span> <span class="nx">ADDRESS</span><span class="p">);</span>
+
+<span class="cm">/* Starting our server
+ * The callback parameter get's called after the
+ * initializing fase is done
+ */</span>
+<span class="nx">server</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Server running, port: "</span> <span class="o">+</span> <span class="nx">server</span><span class="p">.</span><span class="nx">port</span><span class="p">)</span>
 <span class="p">});</span></code></pre></figure>
 
 

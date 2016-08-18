@@ -29,113 +29,128 @@ For this post I am going to assume that you already have the lastest version of 
 
 This is a sample code that you can build on while this tutorial isn't finished, in case you are here already...
 
+### Server.js
 {% highlight js %}
-// TcpServer.js
+// Load the TCP Library
+const net = require('net');
+// importing Client class
+const Client = require('./Client');
 
-var TcpServer = function(port, address) {
-  // Load the TCP Library
-  const net = require('net');
+const Server = function (port, address) {
+  
+  // Currently connected clients
+  var clients = [];
+
   this.port = port || 5000;
   this.address = address || 'localhost';
   
-  var clients = [];
-
-  var events = {
-    'clientConnected' : function(){ return true },
-    'message' : function(){},
-    'clientDisconnected' : function(){},
+  // Broadcast messages to the network
+  this.broadcast = (message, clientSender) => {
+    clients.forEach((client) => {
+      // Sender doesn't receive it's own message
+      if (clientSender != undefined && client === clientSender)
+        return;
+      client.receiveMessage(message);
+    });
+    console.log(message.replace(/\n+$/, ""));
   };
 
-  this.on = function (event, callback) {
-    if (!(event in events))
-      throw new Error("This event doesn't exist: " + event);
-    events[event] = callback;
-    return this;
-  };
+  this.start = function(callback) {
 
-  this.serverBroadcast = function (message) {
-    broadcast(undefined, "SERVER: " + message + "\n");
-    return this;
-  }
+    /*
+     * Creating New Server
+     * The callback get's called when a new client joins the server
+    */ 
+    var server = this;
+    this.connection = net.createServer((socket) => {
+      
+      var client = new Client(socket);
 
-  this.clientBroadcast = function (client, message) {
-    broadcast(client, client.name + " SENT: " + message);
-    return this;
-  }
+      // Validation, if the client is valid
+      if (!validateClient(client)) {
+        client.socket.destroy();
+        return;
+      }
+      // Broadcast the new connection
+      server.broadcast(client.name + " connected.\n", client);
+      // Storing client for later usage
+      clients.push(client);
 
-  function broadcast (clientSender, message) {
-      clients.forEach(function (client) {
-        // Don't want to send it to sender
-        if (client === clientSender) return;
-        client.send(message);
+      // Triggered on message received by this client
+      socket.on('data', (data) => { 
+        // Broadcasting the message
+        server.broadcast(client.name + " -> " + data, client);
       });
-    };    
+      
+      // Triggered when this client disconnects
+      socket.on('end', () => {
+        // Removing the client from the list
+        clients.splice(clients.indexOf(client), 1);
+        // Broadcasting that this player left
+        server.broadcast(client.name + " disconnected.\n");
+      });
 
-  this.connection = net.createServer(function(socket) {
-
-    var client = new Client(socket);
-    // validate
-    if (!events['clientConnected'](client)) {
-      client.socket.destroy();
-      return;
+    });
+    // starting the server
+    this.connection.listen(this.port, this.address);
+    
+    // setuping the callback of the start function
+    if (callback != undefined) {
+      this.connection.on('listening', callback);  
     }
+    
+  };
 
-    // new client!
-    clients.push(client);
-
-    // setup events
-    socket.on('data', function(data) { 
-      events['message'](client, data);
-    });
-    socket.on('end', function () {
-      clients.splice(clients.indexOf(client), 1);
-        events['clientDisconnected'](client);
-    });
-
-  }).listen(this.port, this.address);
-
+  /*
+   * An example function: Validating the client
+   */
+  function validateClient(client)  {
+    return client.isLocalhost();
+  }
+  
   return this;
 };
 
-// Client.js
+module.exports = Server;
+{% endhighlight %}
 
-var Client = function (socket) {
+### Client.js
+{% highlight js %}
+const Client = function (socket) {
   this.address = socket.remoteAddress;
   this.port    = socket.remotePort;
   this.name    = this.address + ":" + this.port;
   this.socket  = socket;
 
-  this.send = function(message) {
+  this.receiveMessage = (message) => {
     this.socket.write(message);
   };
 
-  this.isLocalhost = function () {
+  this.isLocalhost = () => {
     return this.address == "127.0.0.1" || this.address == "localhost";
-  }
+  };  
 };
 
-// main.js
+module.exports = Client;
+{% endhighlight %}
 
-var server = new TcpServer(46131, "127.0.0.1");
+### init.js
+{% highlight js %}
+// importing Server class
+const Server = require('./Server');
 
-server
-  .on("clientConnected", function(client) {
-    if (client.isLocalhost()) {
-      server.serverBroadcast(client.name + " connected.");
-      return true;
-    } else {
-      return false; 
-    }   
-  })
-  .on("message", function(client, message) {
-    server.clientBroadcast(client, message);
-  })
-  .on("clientDisconnected", function (client) {
-    server.serverBroadcast(client.name + " disconnected.");
-  });
+// Our configuration
+const PORT = 46141;
+const ADDRESS = "127.0.0.1"
 
-server.connection.on('listening', function() {
-  console.log("Chat server running at port " + server.port + "\n");
+var server = new Server(PORT, ADDRESS);
+
+/* Starting our server
+ * The callback parameter get's called after the
+ * initializing fase is done
+ */
+server.start(function () {
+  console.log("Server running, port: " + server.port)
 });
 {% endhighlight %}
 
