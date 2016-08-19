@@ -92,6 +92,8 @@
 
 <p>For this post I am going to assume that you already have the lastest version of <a href="https://nodejs.org/en/">Node.js</a> installed and working, and the command <code class="highlighter-rouge">node</code> is avaliable in your command line. You can test this with <code class="highlighter-rouge">node -v</code>. If the output was &gt;= v4.2.6, you are probably safe to go ahead, if not, I recommend that you upgrade your Node.js.</p>
 
+<p>I am also assuming a basic knowlodge of javascript (ES6).</p>
+
 <h3 id="about-node">About Node</h3>
 
 <p>Node.js has a very neat feature that enables the possibilty of importing code from other <strong>.js</strong> files, this is done through the <code class="highlighter-rouge">require</code> function. Using this we can separate the roles of our application in different classes and files. To use an object, class, function or variable from another script in the same folder, you can use the following snippet:</p>
@@ -106,14 +108,37 @@
   <p>… provides reliable, ordered, and error-checked delivery of a stream of octets between applications running on hosts communicating over an IP network.</p>
 </blockquote>
 
-<p>This means that the protocol can guarantee that what you send through the network and over IP is always arrived at the other end. TCP also has the special feature of keeping the connections opened for later referece and usage. An usual connection flow:</p>
+<p>This means that the protocol can guarantee that what you send through the network and over IP is always arrived at the other end. TCP also has the special feature of keeping the connections opened for later referece and usage. An usual connection flow happens like this:</p>
 
 <ul>
   <li>Client connects to the server at an IP Address and a Port (Ex: 127.0.0.1:3000)</li>
-  <li>Server accepts the connection, now the client can keep a reference to the pipe that goes to the server and the server can also do the same.</li>
+  <li>Server accepts the connection, now the client can keep a reference to the “pipe” that goes to the server and the server can also do the same.</li>
   <li>Both send messages to each other.</li>
   <li>The connection can be closed by any side.</li>
 </ul>
+
+<h3 id="starting-our-server">Starting our server</h3>
+
+<p>Use the following snippet to start the server, copy the contents and create a file name <code class="highlighter-rouge">init.js</code>:</p>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="cp">#!/usr/bin/env node
+</span><span class="s1">'use strict'</span><span class="p">;</span>
+
+<span class="c1">// load the Node.js TCP library</span>
+<span class="kr">const</span> <span class="nx">net</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'net'</span><span class="p">);</span>
+
+<span class="kr">const</span> <span class="nx">PORT</span> <span class="o">=</span> <span class="mi">5000</span><span class="p">;</span>
+<span class="kr">const</span> <span class="nx">ADDRESS</span> <span class="o">=</span> <span class="s1">'127.0.0.1'</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">on_client_connected</span><span class="p">(</span><span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"New client: "</span><span class="o">+</span><span class="nx">socket</span><span class="p">.</span><span class="nx">removeAddress</span><span class="o">+</span><span class="s1">':'</span><span class="o">+</span><span class="nx">socket</span><span class="p">.</span><span class="nx">removePort</span><span class="p">);</span>
+  <span class="nx">client</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="nx">destroy</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">server</span> <span class="o">=</span> <span class="nx">net</span><span class="p">.</span><span class="nx">createServer</span><span class="p">(</span><span class="nx">on_client_connected</span><span class="p">);</span>
+<span class="nx">server</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">PORT</span><span class="p">,</span> <span class="nx">ADDRESS</span><span class="p">);</span></code></pre></figure>
+
+<p>So, whats happening here: the first line guarantees that we can run the server as an executable file, skipping the <code class="highlighter-rouge">node</code> command before the script name. The second line enables <a href="#">strictures</a> in the file. After that, we load the required TCP library from the Node.js default libs.</p>
 
 <h3 id="serverjs">Server.js</h3>
 

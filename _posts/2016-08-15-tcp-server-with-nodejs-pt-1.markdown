@@ -24,6 +24,8 @@ This series will be done in paralel with our other series "[C# - Unity3D TCP Cli
 
 For this post I am going to assume that you already have the lastest version of [Node.js][node] installed and working, and the command `node` is avaliable in your command line. You can test this with `node -v`. If the output was >= v4.2.6, you are probably safe to go ahead, if not, I recommend that you upgrade your Node.js.
 
+I am also assuming a basic knowlodge of javascript (ES6).
+
 ### About Node
 
 Node.js has a very neat feature that enables the possibilty of importing code from other **.js** files, this is done through the `require` function. Using this we can separate the roles of our application in different classes and files. To use an object, class, function or variable from another script in the same folder, you can use the following snippet:
@@ -38,12 +40,37 @@ By [Wikipedia][tcp-wikipedia], Transmission Control Protocol:
 
 > ... provides reliable, ordered, and error-checked delivery of a stream of octets between applications running on hosts communicating over an IP network. 
 
-This means that the protocol can guarantee that what you send through the network and over IP is always arrived at the other end. TCP also has the special feature of keeping the connections opened for later referece and usage. An usual connection flow:
+This means that the protocol can guarantee that what you send through the network and over IP is always arrived at the other end. TCP also has the special feature of keeping the connections opened for later referece and usage. An usual connection flow happens like this:
 
 * Client connects to the server at an IP Address and a Port (Ex: 127.0.0.1:3000)
-* Server accepts the connection, now the client can keep a reference to the pipe that goes to the server and the server can also do the same.
+* Server accepts the connection, now the client can keep a reference to the "pipe" that goes to the server and the server can also do the same.
 * Both send messages to each other.
 * The connection can be closed by any side.
+
+### Starting our server
+
+Use the following snippet to start the server, copy the contents and create a file name `init.js`:
+
+{% highlight js %}
+#!/usr/bin/env node
+'use strict';
+
+// load the Node.js TCP library
+const net = require('net');
+
+const PORT = 5000;
+const ADDRESS = '127.0.0.1';
+
+function on_client_connected(socket) {
+  console.log("New client: "+socket.removeAddress+':'+socket.removePort);
+  client.socket.destroy();
+}
+
+var server = net.createServer(on_client_connected);
+server.listen(PORT, ADDRESS);
+{% endhighlight %}
+
+So, whats happening here: the first line guarantees that we can run the server as an executable file, skipping the `node` command before the script name. The second line enables [strictures][js-strict] in the file. After that, we load the required TCP library from the Node.js default libs.
 
 
 ### Server.js
@@ -175,3 +202,4 @@ server.start(function () {
 [unity-tcp-series]: #
 [tcp-wikipedia]: https://en.wikipedia.org/wiki/Transmission_Control_Protocol
 [udp-wikipedia]: #
+[js-strict]: #
