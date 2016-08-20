@@ -5,6 +5,7 @@ date: 2016-08-15T00:12:30-03:00
 categories: javascript node-js server programming
 cover_picture: node.png # this picture is inside /img/posts/cover
 author: "Richard Eitz"
+description: "How to: Setup and configure Node.js TCP server application and more"
 ---
 
 > **TL;DR:** This is a tutorial, so our code will be done in small parts. In case you are in a hurry and just need the final code, we've made a github repository for you: [here][repository].
