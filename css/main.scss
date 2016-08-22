@@ -55,10 +55,18 @@ $on-laptop:        800px;
 // our styles
 
 .logo {
-	width: 50px;
+	width: 140px;
 	height: auto;
 	float: left;
+  padding: 7px;
+  transition: 0.5s;
+  &:hover {
+    -webkit-filter: grayscale(1);
+    -webkit-filter: grayscale(100%);
+    filter: grayscale(100%);
+  }
 }
+
 
 .site-header {
 	border-top-color: #00B0CE;
