@@ -18,6 +18,7 @@ disqus_username: frosty-bay
 github_username: frostybay
 # link style for blog posts
 permalink: /articles/:title
+highlighter: rouge
 
 # Build settings
 markdown: kramdown

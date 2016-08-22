@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Tutorial: TCP Server with Node.js</title>
+  
+  	<meta name="description" content="How to: Setup and configure Node.js TCP server application and more">
+	
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://frostybay.com/articles/tcp-server-with-nodejs">
+  <link rel="alternate" type="application/rss+xml" title="Frosty Bay" href="http://frostybay.com/feed.xml">
+
+  
+    <meta name="og:image" content="http://frostybay.com/img/posts/cover/node.png" />
+  
+
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <img class="logo" src="/img/logo.png" />
+
+    <a class="site-title" href="/">Frosty Bay</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  
+    <div class="post-cover">
+      <img src="/img/posts/cover/node.png" />    
+    </div>
+  
+
+  <p class="post-back">
+    <a href="/">&laquo; Back to articles </a>
+  </p>
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Tutorial: TCP Server with Node.js</h1>
+    <p class="post-meta"><time datetime="2016-08-15T00:12:30-03:00" itemprop="datePublished">Aug 15, 2016</time> • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Richard Eitz</span></span></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <blockquote>
+  <p><strong>TL;DR:</strong> This is a tutorial, so our code will be done in small parts. In case you are in a hurry and just need the final code, we’ve made a github repository for you: <a href="https://github.com/frostybay/tutorial-nodejs-tcp-server">here</a>.</p>
+</blockquote>
+
+<p>Topics we will be doing in this tutorial:</p>
+
+<ul>
+  <li>Setup and configure a Node.js application</li>
+  <li>Understand how TCP works</li>
+  <li>Handle incoming connections and messages</li>
+  <li>Manage our clients</li>
+  <li>Broadcast events to clients</li>
+</ul>
+
+<!-- 
+  This series will be done in paralel with our other series "[C# - Unity3D TCP Client][unity-tcp-series]", so it's possible that we will be referencing material from there sometimes. But, if you already know how to write your own client in your favorite language, you won't need it because all the tests can be done with telnet.
+-->
+
+<p>All the client tests will be done with <a href="https://en.wikipedia.org/wiki/Telnet">telnet</a> software. There is not a client source in this tutorial.</p>
+
+<hr />
+
+<h2 id="good-to-know-things">Good-to-know things:</h2>
+
+<h3 id="about-node">About Node</h3>
+
+<p>For this post I am going to assume that you already have the lastest version of <a href="https://nodejs.org/en/">Node.js</a> installed and working, and the command <code class="highlighter-rouge">node</code> is avaliable in your command line. You can test this with <code class="highlighter-rouge">node -v</code>. If the output was &gt;= v4.2.6, you are probably safe to go ahead, if not, I recommend that you upgrade your Node.js.</p>
+
+<p>Node.js has a very neat feature that enables the possibilty of importing code from other <strong>.js</strong> files, this is done through the <code class="highlighter-rouge">require</code> function. Using this we can separate the roles of our application in different classes and files. To use an object, class, function or variable from another script in the same folder, you can use the following snippet:</p>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">yourClass</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./yourClass'</span><span class="p">);</span></code></pre></figure>
+
+<h3 id="about-es6">About ES6</h3>
+
+<p>I assume a basic knowledge of javascript (ES6) as in this tutorial you will see the usage of three new features of javascript. This first one is the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes">class</a>. The second one is <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions">arrow functions</a>. And the third one are the quotes like these: `string`. Inside them we can interpolate variables using this notation: <code class="highlighter-rouge">Stringy and ${var} are friends</code>. They are just syntatic sugar for writing better and cleaner code.</p>
+
+<p>Examples:</p>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// Class &amp; String interpolation</span>
+<span class="kr">class</span> <span class="nx">Person</span> <span class="p">{</span>
+  <span class="nx">constructor</span> <span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="nx">greet</span> <span class="p">(</span><span class="nx">otherPerson</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span> <span class="nl">says</span><span class="p">:</span> <span class="nx">hello</span> <span class="nx">$</span><span class="p">{</span><span class="nx">otherPerson</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span><span class="o">!</span><span class="err">`</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Person</span><span class="p">(</span><span class="s1">'Bob'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Person</span><span class="p">(</span><span class="s1">'Dude'</span><span class="p">);</span>
+<span class="nx">a</span><span class="p">.</span><span class="nx">greet</span><span class="p">(</span><span class="nx">b</span><span class="p">);</span> <span class="c1">// Bob says: hello Dude!</span>
+
+<span class="c1">// Arrow function</span>
+<span class="nx">executeSomething</span><span class="p">((</span><span class="nx">firstParam</span><span class="p">,</span> <span class="nx">secondParam</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// callback_code</span>
+<span class="p">});</span></code></pre></figure>
+
+<h3 id="the-tcp-protocol">The TCP protocol</h3>
+
+<p>A little introduction to the TCP protocol:</p>
+
+<p>By <a href="https://en.wikipedia.org/wiki/Transmission_Control_Protocol">Wikipedia</a>, Transmission Control Protocol:</p>
+
+<blockquote>
+  <p>… provides reliable, ordered, and error-checked delivery of a stream of octets between applications running on hosts communicating over an IP network.</p>
+</blockquote>
+
+<p>This means that the protocol can guarantee that what you send through the network and over IP is always arrived at the other end. TCP also has the special feature of keeping the connections opened for later referece and usage. An usual connection flow happens like this:</p>
+
+<ul>
+  <li>Client connects to the server at an IP Address and a Port (Ex: 127.0.0.1:3000)</li>
+  <li>Server accepts the connection, now the client can keep a reference to the “pipe” that goes to the server and the server can also do the same.</li>
+  <li>Both send messages to each other.</li>
+  <li>The connection can be closed by any side.</li>
+</ul>
+
+<p><strong>Enough said, let’s get started!</strong></p>
+
+<hr />
+
+<h3 id="booting-up">Booting up</h3>
+
+<p>Use the following snippet to start our coding, copy the contents and create a file name <code class="highlighter-rouge">init.js</code>.</p>
+
+<p>This will be our <strong>first server</strong>:</p>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="cp">#!/usr/bin/env node
+</span><span class="s1">'use strict'</span><span class="p">;</span>
+
+<span class="c1">// load the Node.js TCP library</span>
+<span class="kr">const</span> <span class="nx">net</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'net'</span><span class="p">);</span>
+
+<span class="kr">const</span> <span class="nx">PORT</span> <span class="o">=</span> <span class="mi">5000</span><span class="p">;</span>
+<span class="kr">const</span> <span class="nx">ADDRESS</span> <span class="o">=</span> <span class="s1">'127.0.0.1'</span><span class="p">;</span>
+
+<span class="kd">let</span> <span class="nx">server</span> <span class="o">=</span> <span class="nx">net</span><span class="p">.</span><span class="nx">createServer</span><span class="p">(</span><span class="nx">onClientConnected</span><span class="p">);</span>
+<span class="nx">server</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">PORT</span><span class="p">,</span> <span class="nx">ADDRESS</span><span class="p">);</span>
+
+<span class="kd">function</span> <span class="nx">onClientConnected</span><span class="p">(</span><span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="err">`</span><span class="nx">New</span> <span class="nx">client</span><span class="err">:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">socket</span><span class="p">.</span><span class="nx">remoteAddress</span><span class="p">}</span><span class="err">:</span><span class="nx">$</span><span class="p">{</span><span class="nx">socket</span><span class="p">.</span><span class="nx">remotePort</span><span class="p">}</span><span class="err">`</span><span class="p">);</span>
+  <span class="nx">socket</span><span class="p">.</span><span class="nx">destroy</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="err">`</span><span class="nx">Server</span> <span class="nx">started</span> <span class="nx">at</span><span class="err">:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">ADDRESS</span><span class="p">}</span><span class="err">:</span><span class="nx">$</span><span class="p">{</span><span class="nx">PORT</span><span class="p">}</span><span class="err">`</span><span class="p">);</span></code></pre></figure>
+
+<h4 id="whats-happening-here">Whats happening here</h4>
+
+<p>The first line guarantees that we can run the server as an executable file, skipping the <code class="highlighter-rouge">node</code> command before the script name. The second line enables <a href="https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Strict_mode">strictures</a> in the file. After that, we load the required TCP library from the Node.js default libs for later usage.</p>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="kr">const</span> <span class="nx">PORT</span> <span class="o">=</span> <span class="mi">5000</span><span class="p">;</span>
+<span class="kr">const</span> <span class="nx">ADDRESS</span> <span class="o">=</span> <span class="s1">'127.0.0.1'</span><span class="p">;</span></code></pre></figure>
+
+<p>With these lines we are setuping our default configuration: we will start the server in localhost and at the 5000 port.</p>
+
+<p>Moving for next two line, we first create a new TCP server and pass as a callback the function <code class="highlighter-rouge">on_client_connected</code>. This function will be executed whenever a new client connects to the server. The next line we set it up to listen at the previous configuration values.</p>
+
+<p>All done! Let’s start the server. Run it by first setting the file to be executed with:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>chmod +x init.js</code></pre></figure>
+
+<p>Then, start it up with:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>./init.js</code></pre></figure>
+
+<p>By now you should’ve got the message <em>Server started at: 127.0.0.1:5000</em>.</p>
+
+<p>This means that we are ready to test it using a simple but powerful tool: <a href="https://en.wikipedia.org/wiki/Telnet">telnet</a>. With telnet we can connect to TCP server very easily, just typing <code class="highlighter-rouge">telnet HOST PORT</code> and we are connected.</p>
+
+<p>Let’s do it. Fire up another terminal (protip: <code class="highlighter-rouge">Ctrl+Alt+T</code>) and run the following line:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>telnet 127.0.0.1 5000</code></pre></figure>
+
+<p>Ok, nice. If everything went well our telnet client tryed to connect, connected, got something about a escape character and then got a closed connection.</p>
+
+<p>This is all expected.</p>
+
+<p>Now go check out the terminal with our server, it did what we asked it to do: it received the connection, logged the client to the console and detroyed (closed) the pipe, Yay! A weird result, but nice.</p>
+
+<p>We’re ready to upgrade it.</p>
+
+<h3 id="upgrading-our-server">Upgrading our server</h3>
+
+<p>That’s cool and all but kind of useless. The whole purpose of a network connection is to send messages from one end to another, right?</p>
+
+<p>Ok, so let’s start <strong>sending messages</strong> from client to the server and from the server to the client. Update your function <code class="highlighter-rouge">onClientConnected</code> in init.js with the following code:</p>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">onClientConnected</span><span class="p">(</span><span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="c1">// Giving a name to this client</span>
+  <span class="kd">let</span> <span class="nx">clientName</span> <span class="o">=</span> <span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">socket</span><span class="p">.</span><span class="nx">remoteAddress</span><span class="p">}</span><span class="err">:</span><span class="nx">$</span><span class="p">{</span><span class="nx">socket</span><span class="p">.</span><span class="nx">remotePort</span><span class="p">}</span><span class="err">`</span><span class="p">;</span>
+
+  <span class="c1">// Logging the message on the server</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">clientName</span><span class="p">}</span> <span class="nx">connected</span><span class="p">.</span><span class="err">`</span><span class="p">);</span>
+
+  <span class="c1">// Triggered on data received by this client</span>
+  <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'data'</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span> 
+
+    <span class="c1">// getting the string message and also trimming</span>
+    <span class="c1">// new line characters [\r or \n]</span>
+    <span class="kd">let</span> <span class="nx">m</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">toString</span><span class="p">().</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/</span><span class="se">[\n\r]</span><span class="sr">*$/</span><span class="p">,</span> <span class="s1">''</span><span class="p">);</span>
+
+    <span class="c1">// Logging the message on the server</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">clientName</span><span class="p">}</span> <span class="nl">said</span><span class="p">:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">m</span><span class="p">}</span><span class="err">`</span><span class="p">);</span>
+
+    <span class="c1">// notifing the client</span>
+    <span class="nx">socket</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="err">`</span><span class="nx">We</span> <span class="nx">got</span> <span class="nx">your</span> <span class="nx">message</span> <span class="p">(</span><span class="nx">$</span><span class="p">{</span><span class="nx">m</span><span class="p">}).</span> <span class="nx">Thanks</span><span class="o">!</span><span class="err">\</span><span class="nx">n</span><span class="err">`</span><span class="p">);</span>
+  <span class="p">});</span>
+  
+  <span class="c1">// Triggered when this client disconnects</span>
+  <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'end'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="c1">// Logging this message on the server</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">clientName</span><span class="p">}</span> <span class="nx">disconnected</span><span class="p">.</span><span class="err">`</span><span class="p">);</span>
+  <span class="p">});</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>The code itself is pretty self explanatory with the comments, but, just for sure: the function <code class="highlighter-rouge">onClientConnected</code> get’s executed only one time, when the client connects. In it we are giving the client a name and setting up some events. The events are:</p>
+
+<h4 id="about-ondata--onend">About on(‘data’) &amp; on(‘end’)</h4>
+
+<p>These are both events that will be triggered (get executed) when special events happen.</p>
+
+<p><strong>‘data’</strong>: happens when the server receives data from the client. The param <code class="highlighter-rouge">data</code> can be a buffer of bytes or just a string. We’ll be using it as a string for now.</p>
+
+<p>Inside of the callback we’re logging the message to the console of the server and also notifying the client that the message was succesfully recieved.</p>
+
+<p><strong>‘end’</strong>: it happens when the client disconnects from the server. For now we are just logging who disconnected in the server’s console.</p>
+
+<p><strong>Time to test!</strong> You can try again using the telnet client:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>telnet 127.0.0.1 5000</code></pre></figure>
+
+<p>This time instead of a instant disconnect we get a prompt for writing something.</p>
+
+<p>Go ahead and write a message for the server! You can keep both terminals open so you can see it happen in action.</p>
+
+<p><em>Tip: Now should be a good time to say that to “get out” of the telnet client you should press</em> <code class="highlighter-rouge">Ctrl+]</code> <em>and then</em> <code class="highlighter-rouge">q</code><em>. This is what the escape character was all about.</em></p>
+
+<p>Quit telnet now.</p>
+
+<p>If everything again went well, the server output should be like this after we’ve done that.</p>
+
+<p><strong>server</strong></p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>./init.js 
+Server started at: 127.0.0.1:5000
+127.0.0.1:54052 connected.
+127.0.0.1:54052 said: Hey
+127.0.0.1:54052 disconnected.</code></pre></figure>
+
+<p>And the client:</p>
+
+<p><strong>client</strong></p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">$ </span>telnet localhost 5000
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is <span class="s1">'^]'</span>.
+Hey
+We got your message <span class="o">(</span>Hey<span class="o">)</span>. Thanks!
+^]
+<span class="gp">telnet&gt; </span>q
+Connection closed.</code></pre></figure>
+
+<p>It’s working! The client’s port and the message you typed maybe different, but that’s cool.</p>
+
+<p>I guess it is time to make this a real server enabling multiple connections (clients) that can speak to each other. Let’s update our code once again.</p>
+
+<h3 id="multiple-clients-multiple-fun">Multiple clients, multiple fun</h3>
+
+<p>Things are getting big now, it’s only a matter of time for the messy code to arrive.</p>
+
+<p><strong>Let’s be cautious</strong>: It is time to start separating the roles to different classes and files. Our server will now live inside Server.js, our client will have it’s own class and file too: Client.js. We will keep the init.js, it will still be our application that glues everything.</p>
+
+<p>Our init.js should be upgraded again. It is now very neat and simple:</p>
+
+<p><strong>init.js</strong></p>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="cp">#!/usr/bin/env node
+</span><span class="s1">'use strict'</span><span class="p">;</span>
+
+<span class="c1">// importing Server class</span>
+<span class="kr">const</span> <span class="nx">Server</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./Server'</span><span class="p">);</span>
+
+<span class="c1">// Our configuration</span>
+<span class="kr">const</span> <span class="nx">PORT</span> <span class="o">=</span> <span class="mi">5000</span><span class="p">;</span>
+<span class="kr">const</span> <span class="nx">ADDRESS</span> <span class="o">=</span> <span class="s2">"127.0.0.1"</span>
+
+<span class="kd">var</span> <span class="nx">server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Server</span><span class="p">(</span><span class="nx">PORT</span><span class="p">,</span> <span class="nx">ADDRESS</span><span class="p">);</span>
+
+<span class="c1">// Starting our server</span>
+<span class="nx">server</span><span class="p">.</span><span class="nx">start</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="err">`</span><span class="nx">Server</span> <span class="nx">started</span> <span class="na">at</span><span class="p">:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">ADDRESS</span><span class="p">}</span><span class="err">:</span><span class="nx">$</span><span class="p">{</span><span class="nx">PORT</span><span class="p">}</span><span class="err">`</span><span class="p">);</span>
+<span class="p">});</span></code></pre></figure>
+
+<p>Ok, we’ll be moving all the server logic to a file name Server.js. You should copy the contents below. It’s a big file, so you can take your time to try to understand by yourself what’s going on or wait a little bit that everything is going to get explained.</p>
+
+<p>We moved the function <code class="highlighter-rouge">onClientConnected</code> to the inside of the <code class="highlighter-rouge">start</code> function of the server. It’s a good place to start looking.</p>
+
+<p><em>If you look carefully over the Server.js you may notice some TODOS. These are work that we’ll be doing in the next part.</em></p>
+
+<p><strong>Server.js</strong></p>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="s1">'use strict'</span><span class="p">;</span>
+<span class="kr">const</span> <span class="nx">net</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'net'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">Client</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./Client'</span><span class="p">);</span> <span class="c1">// importing Client class</span>
+
+<span class="kr">class</span> <span class="nx">Server</span> <span class="p">{</span>
+  <span class="nx">constructor</span> <span class="p">(</span><span class="nx">port</span><span class="p">,</span> <span class="nx">address</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">port</span> <span class="o">=</span> <span class="nx">port</span> <span class="o">||</span> <span class="mi">5000</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">address</span> <span class="o">=</span> <span class="nx">address</span> <span class="o">||</span> <span class="s1">'127.0.0.1'</span><span class="p">;</span>
+    <span class="c1">// Holds our currently connected clients</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">clients</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="p">}</span>
+  <span class="cm">/*
+   * Starting the server
+   * The callback argument is executed when the server finally inits
+  */</span> 
+  <span class="nx">start</span> <span class="p">(</span><span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">server</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span> <span class="c1">// we'll use 'this' inside the callback below</span>
+    <span class="c1">// our old onClientConnected</span>
+    <span class="nx">server</span><span class="p">.</span><span class="nx">connection</span> <span class="o">=</span> <span class="nx">net</span><span class="p">.</span><span class="nx">createServer</span><span class="p">((</span><span class="nx">socket</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span> 
+      <span class="kd">let</span> <span class="nx">client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Client</span><span class="p">(</span><span class="nx">socket</span><span class="p">);</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">client</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span> <span class="nx">connected</span><span class="p">.</span><span class="err">`</span><span class="p">);</span>
+
+      <span class="c1">// TODO 1: Broadcast to everyone connected the new client connection</span>
+
+      <span class="c1">// Storing client for later usage</span>
+      <span class="nx">server</span><span class="p">.</span><span class="nx">clients</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">client</span><span class="p">);</span>
+      
+      <span class="c1">// Triggered on message received by this client</span>
+      <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'data'</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span> 
+        <span class="kd">let</span> <span class="nx">m</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">toString</span><span class="p">().</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/</span><span class="se">[\n\r]</span><span class="sr">*$/</span><span class="p">,</span> <span class="s1">''</span><span class="p">);</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">clientName</span><span class="p">}</span> <span class="nl">said</span><span class="p">:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">m</span><span class="p">}</span><span class="err">`</span><span class="p">);</span>
+        <span class="nx">socket</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="err">`</span><span class="nx">We</span> <span class="nx">got</span> <span class="nx">your</span> <span class="nx">message</span> <span class="p">(</span><span class="nx">$</span><span class="p">{</span><span class="nx">m</span><span class="p">}).</span> <span class="nx">Thanks</span><span class="o">!</span><span class="err">\</span><span class="nx">n</span><span class="err">`</span><span class="p">);</span>
+        <span class="c1">// TODO 2: Broadcasting the client's message to the other clients</span>
+      <span class="p">});</span>
+      
+      <span class="c1">// Triggered when this client disconnects</span>
+      <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'end'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="c1">// Removing the client from the list</span>
+        <span class="nx">server</span><span class="p">.</span><span class="nx">clients</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">server</span><span class="p">.</span><span class="nx">clients</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">client</span><span class="p">),</span> <span class="mi">1</span><span class="p">);</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">client</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span> <span class="nx">disconnected</span><span class="p">.</span><span class="err">`</span><span class="p">);</span>
+        <span class="c1">// TODO 3: Broadcasting that this client left</span>
+      <span class="p">});</span>
+    <span class="p">});</span>
+    <span class="c1">// starting the server</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">connection</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">port</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">address</span><span class="p">);</span>
+    <span class="c1">// setuping the callback of the start function</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">connection</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'listening'</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="c1">// TODO</span>
+  <span class="nx">broadcast</span><span class="p">(</span><span class="nx">message</span><span class="p">,</span> <span class="nx">clientSender</span><span class="p">)</span> <span class="p">{}</span>
+<span class="p">}</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Server</span><span class="p">;</span></code></pre></figure>
+
+<h4 id="understanding-serverjs-before-executing-again">Understanding Server.js before executing again</h4>
+
+<p>Let’s review all the new methods of Server class:</p>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">constructor</span> <span class="p">(</span><span class="nx">port</span><span class="p">,</span> <span class="nx">address</span><span class="p">)</span></code></pre></figure>
+
+<p>Our Server class constructor isn’t doing much, just setting up everything that’s going to be needed for the start function. It expects a port and an address. A new thing here is that we’ve initialized the <code class="highlighter-rouge">clients</code> array. It will hold our clients for later usage.</p>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">start</span> <span class="p">(</span><span class="nx">callback</span><span class="p">)</span></code></pre></figure>
+
+<p>We’ve copied the contents of onClientConnected here and made some modifications for it to work inside the class. We are also instantiating Client instances. The callback received is executed when the server finishes it’s initializing fase. Other than that it’s almost the same code we had before, with the exception that we’ve added some TODOS to be done. These are addressed below:</p>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// TODO</span>
+<span class="nx">broadcast</span><span class="p">(</span><span class="nx">message</span><span class="p">,</span> <span class="nx">clientSender</span><span class="p">)</span></code></pre></figure>
+
+<p>As we didn’t knew anything about broadcasting, before adding any code I should explain what it is:</p>
+
+<p>The idea of broadcasting information is like almost exactly like the everyday usage of the word for radios or TV. <strong>Broadcasting is the act of sending a message to everyone on the network.</strong></p>
+
+<p>Let’s continue to finish the server before executing it, it’s time to update your broadcast function and here’s how we gonna do it:</p>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="cm">/*
+ * Broadcasts messages to the network
+ * The clientSender doesn't receive it's own message
+*/</span>
+<span class="nx">broadcast</span> <span class="p">(</span><span class="nx">message</span><span class="p">,</span> <span class="nx">clientSender</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">clients</span><span class="p">.</span><span class="nx">forEach</span><span class="p">((</span><span class="nx">client</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">client</span> <span class="o">===</span> <span class="nx">clientSender</span><span class="p">)</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="nx">client</span><span class="p">.</span><span class="nx">receiveMessage</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
+  <span class="p">});</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">message</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/</span><span class="se">\n</span><span class="sr">+$/</span><span class="p">,</span> <span class="s2">""</span><span class="p">));</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>An iteration on the clients array (They get stored as they connect to the server). And a simple call to the client’s method <code class="highlighter-rouge">receiveMessage</code> to send the message. We’re also logging in the server all the messages sent, without the trailling new line.</p>
+
+<p>As we didn’t had a broadcast function before, we couldn’t contact our clients when something happened on the network. But now he have one! Let’s update our previous TODOs as well.</p>
+
+<p><em>* TODO 1: Broadcast to everyone connected the new client connection</em></p>
+
+<p>We are going to easily just update the line with the following code:</p>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// Broadcast the new connection</span>
+<span class="nx">server</span><span class="p">.</span><span class="nx">broadcast</span><span class="p">(</span><span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">client</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span> <span class="nx">connected</span><span class="p">.</span><span class="err">\</span><span class="nx">n</span><span class="err">`</span><span class="p">,</span> <span class="nx">client</span><span class="p">);</span></code></pre></figure>
+
+<p>The broadcast receives two parameters, one is the message itself and the other is the client who emmited the message. He shouldn’t receive his own message.</p>
+
+<p><em>* TODO 2: Broadcasting the client’s message to the other clients</em></p>
+
+<p>Now that we know how to use the broadcast function we can just update the the TODO 2 as well. You can replace everything inside the ‘data’ event because the logging is already being done inside the broadcast method.</p>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// Triggered on message received by this client</span>
+<span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'data'</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span> 
+  <span class="c1">// Broadcasting the message</span>
+  <span class="nx">server</span><span class="p">.</span><span class="nx">broadcast</span><span class="p">(</span><span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">client</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span> <span class="nl">says</span><span class="p">:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">data</span><span class="p">}</span><span class="err">`</span><span class="p">,</span> <span class="nx">client</span><span class="p">);</span>
+<span class="p">});</span></code></pre></figure>
+
+<p><em>*TODO 3: Broadcasting that this client left</em></p>
+
+<p>Again, just a simple usage of the broadcast function. Update the whole ‘end’ event:</p>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// Triggered when this client disconnects</span>
+<span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'end'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// Removing the client from the list</span>
+  <span class="nx">server</span><span class="p">.</span><span class="nx">clients</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">server</span><span class="p">.</span><span class="nx">clients</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">client</span><span class="p">),</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="c1">// Broadcasting that this player left</span>
+  <span class="nx">server</span><span class="p">.</span><span class="nx">broadcast</span><span class="p">(</span><span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">client</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span> <span class="nx">disconnected</span><span class="p">.</span><span class="err">\</span><span class="nx">n</span><span class="err">`</span><span class="p">);</span>
+<span class="p">});</span></code></pre></figure>
+
+<p>And finally: our Client class, super simple. Just copy the contents to a new file called Client.js:</p>
+
+<p><strong>Client.js</strong></p>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="s1">'use strict'</span><span class="p">;</span>
+
+<span class="kr">class</span> <span class="nx">Client</span> <span class="p">{</span>
+  
+  <span class="nx">constructor</span> <span class="p">(</span><span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">address</span> <span class="o">=</span> <span class="nx">socket</span><span class="p">.</span><span class="nx">remoteAddress</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">port</span>    <span class="o">=</span> <span class="nx">socket</span><span class="p">.</span><span class="nx">remotePort</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">name</span>    <span class="o">=</span> <span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">address</span><span class="p">}</span><span class="err">:</span><span class="nx">$</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">port</span><span class="p">}</span><span class="err">`</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">socket</span>  <span class="o">=</span> <span class="nx">socket</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="nx">receiveMessage</span> <span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
+  <span class="p">}</span>
+
+<span class="p">}</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Client</span><span class="p">;</span></code></pre></figure>
+
+<p>All the complete source for the three files can be found here: <a href="https://github.com/frostybay/tutorial-nodejs-tcp-server/blob/master/Server.js">Server.js</a>, <a href="https://github.com/frostybay/tutorial-nodejs-tcp-server/blob/master/Client.js">Client.js</a> and <a href="https://github.com/frostybay/tutorial-nodejs-tcp-server/blob/master/init.js">init.js</a>.</p>
+
+<h2 id="finalizing-and-the-final-test">Finalizing and the final test</h2>
+
+<p>If you followed the tutorial copying everything in the right place we should be ready to use the server to it’s full potential. Go ahead and execute the <code class="highlighter-rouge">init.js</code> program, aditionally open two new terminals for the clients. In both of them use the telnet as we did before to connect, send messages and disconnect/reconnect.</p>
+
+<p>The messages should be flowing from client to server and then from server to all the other clients. The server is also logging the conversation for stalking purposes (:P).</p>
+
+<h2 id="the-end--the-full-source-code">The end &amp; The full source code</h2>
+
+<p>This is it, if you have any questions that were not answered in the tutorial above, feel free to ask in the comments section.</p>
+
+<p>The final source code can be also be found <a href="https://github.com/frostybay/tutorial-nodejs-tcp-server">here</a>.</p>
+
+
+  </div>
+
+  <div class="page-navigation">
+	  
+	  
+	</div>
+
+  
+    
+<div id="disqus_thread"></div>
+<script>
+
+var disqus_config = function () {
+    this.page.url = 'http://frostybay.com' + '/articles/tcp-server-with-nodejs';  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = '/articles/tcp-server-with-nodejs'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+(function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = '//frosty-bay.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+
+  
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Frosty Bay</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Contact</li>
+          <li><a href="mailto:contato@frostybay.com">contato@frostybay.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/frostybay"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">frostybay</span></a>
+
+          </li>
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>Frosty Bay is an indie game development studio based in Itapema, Brazil and this is our website. This is where we put some articles about interesting stuff.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
