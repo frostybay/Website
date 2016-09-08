@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Tutorial: A simple chat with Unity UNET</title>
+  
+  	<meta name="description" content="Description">
+	
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://frostybay.com/articles/a-simple-tutorial-with-unity-unet">
+  <link rel="alternate" type="application/rss+xml" title="Frosty Bay" href="http://frostybay.com/feed.xml">
+
+  
+  	<meta name="og:image" content="http://frostybay.com/img/logo.png" />
+  
+
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">
+      <img title="Frosty Bay" alt="Frosty Bay" class="logo" src="/img/frosty-bay-logo.png" />
+    </a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  
+
+  <p class="post-back">
+    <a href="/">&laquo; Back to articles </a>
+  </p>
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Tutorial: A simple chat with Unity UNET</h1>
+    <p class="post-meta"><time datetime="2016-08-20T00:12:30-03:00" itemprop="datePublished">Aug 20, 2016</time> • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Carlos Cadori</span></span></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="description">Description</h3>
+
+<p>This tutorial will teach you how to build a simple online chat using Unity UNET system.</p>
+
+<h3 id="requirements">Requirements</h3>
+
+<ul>
+  <li>Basic knowledge of Unity Editor.</li>
+  <li>Basic Knowledge of C#.</li>
+  <li>Unity3D 5.1 +.</li>
+</ul>
+
+<hr />
+
+<h3 id="connection-and-scenes">Connection and scenes</h3>
+
+<p>First, we need to create two scenes, online and offline scene.</p>
+
+<p>After that, drag the scenes to <strong>BuildSettings</strong> window (File-&gt;Build Settings).</p>
+
+<p>On the offline scene, create a new empty object and add <strong>NetworkManager</strong> and <strong>NetworkManagerHUD</strong> to it.</p>
+
+<p>Drag our scenes to Offline Scene and Online Scene field on the <strong>NetworkManager</strong>.</p>
+
+<p>Uncheck the box Auto Spawn (Spawn Info -&gt; Auto Spawn) on the <strong>NetworkManager</strong>.</p>
+
+<h3 id="connecting">Connecting</h3>
+
+<p>Start the offline scene and press the button called “LANHost” or “LANClient” on top of the screen.</p>
+
+<p>If you want to connect with <em>Unity Matchmaking</em>, you need to change some settings before.</p>
+
+<h3 id="basic-interface-elements">Basic interface elements</h3>
+
+<p>To start coding, we will need some UI elements to our chat.</p>
+
+<ul>
+  <li>Text – We show messages here.</li>
+  <li>Input Field – We will write here.</li>
+  <li>Button – To send the messages.</li>
+</ul>
+
+<p>They are basic UI elements. You can create them with left-click on hierarchy window.</p>
+
+<p>You can also download my prefab for this tutorial <a href="https://github.com/frostybay/tutorial-chat/tree/master/Assets/Prefabs">here</a>.</p>
+
+<h3 id="interface-methods">Interface methods</h3>
+
+<p>Create a new script to our chat.</p>
+
+<figure class="highlight"><pre><code class="language-c#" data-lang="c#"><span class="k">using</span> <span class="nn">UnityEngine</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">UnityEngine.UI</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">Chat</span> <span class="p">:</span> <span class="n">MonoBehaviour</span>
+<span class="p">{</span>
+  
+<span class="p">}</span></code></pre></figure>
+
+<p>We need import <strong>UnityEngine.UI</strong> to get access to UI classes.</p>
+
+<p>Let’s create some properties to our interface elements.</p>
+
+<figure class="highlight"><pre><code class="language-c#" data-lang="c#"><span class="p">...</span>
+
+  <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+  <span class="k">private</span> <span class="n">Text</span> <span class="n">container</span><span class="p">;</span>
+  
+  <span class="p">[</span><span class="n">SerializeField</span><span class="p">]</span>
+  <span class="k">private</span> <span class="n">ScrollRect</span> <span class="n">rect</span><span class="p">;</span>
+
+<span class="p">...</span></code></pre></figure>
+
+<blockquote>
+  <p>The “SerializeField” tag force property serialization.</p>
+</blockquote>
+
+<p>Now, we need a method to add messages to our chat. Let’s create with internal access, because in the future we will override it.</p>
+
+<figure class="highlight"><pre><code class="language-c#" data-lang="c#"><span class="p">...</span>
+
+  <span class="k">internal</span> <span class="k">void</span> <span class="nf">AddMessage</span><span class="p">(</span><span class="kt">string</span> <span class="n">message</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">container</span><span class="p">.</span><span class="n">text</span> <span class="p">+=</span> <span class="s">"\n"</span> <span class="p">+</span> <span class="n">message</span><span class="p">;</span>
+  <span class="p">}</span>
+
+<span class="p">...</span></code></pre></figure>
+
+<p>We will need also a method to send messages to the server. This method will be just a trigger to our extended class.</p>
+
+<figure class="highlight"><pre><code class="language-c#" data-lang="c#"><span class="p">...</span>
+
+  <span class="k">public</span> <span class="k">virtual</span> <span class="k">void</span> <span class="nf">SendMessage</span><span class="p">(</span><span class="n">InputField</span> <span class="n">input</span><span class="p">)</span> <span class="p">{}</span>
+
+<span class="p">...</span></code></pre></figure>
+
+<p>Attach this method to the event “OnClick” on the button that we have created before.</p>
+
+<h3 id="the-client">The client</h3>
+
+<p>Create a new script to extend our <strong>Chat</strong> class.</p>
+
+<p>Do not forget to import some namespaces to use the <em>UNET</em>.</p>
+
+<figure class="highlight"><pre><code class="language-c#" data-lang="c#"><span class="k">using</span> <span class="nn">UnityEngine</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">UnityEngine.Networking</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">UnityEngine.Networking.NetworkSystem</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">UNETChat</span> <span class="p">:</span> <span class="n">Chat</span>
+<span class="p">{</span>
+
+<span class="p">}</span></code></pre></figure>
+
+<p>We will define a code to our chat messages.</p>
+
+<figure class="highlight"><pre><code class="language-c#" data-lang="c#"><span class="p">...</span>
+
+  <span class="c1">//just a random number
+</span>  <span class="k">private</span> <span class="k">const</span> <span class="kt">short</span> <span class="n">chatMessage</span> <span class="p">=</span> <span class="m">131</span><span class="p">;</span>
+
+<span class="p">...</span></code></pre></figure>
+
+<p>Now, we will create a method to receive our messages. We will receive a <strong>NetworkMessage</strong> object as a parameter and send to a previously created method on <strong>Chat</strong>.</p>
+
+<figure class="highlight"><pre><code class="language-c#" data-lang="c#"><span class="p">...</span>
+  
+  <span class="k">private</span> <span class="k">void</span> <span class="nf">ReceiveMessage</span><span class="p">(</span><span class="n">NetworkMessage</span> <span class="n">message</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="c1">//reading message
+</span>    <span class="kt">string</span> <span class="n">text</span> <span class="p">=</span> <span class="n">message</span><span class="p">.</span><span class="n">ReadMessage</span><span class="p">&lt;</span><span class="n">StringMessage</span><span class="p">&gt;</span> <span class="p">().</span><span class="k">value</span><span class="p">;</span>
+
+    <span class="nf">AddMessage</span> <span class="p">(</span><span class="n">text</span><span class="p">);</span>
+  <span class="p">}</span>
+
+<span class="p">...</span></code></pre></figure>
+
+<p>On start method (called by unity whenever the scene start), we will register a handle to our client, who can be accessed by the <strong>NetworkManager</strong> singleton (I can explain singletons in another post). It means that whenever we receive a message with 131 code, we send to the method <em>ReceiveMessage</em>.</p>
+
+<figure class="highlight"><pre><code class="language-c#" data-lang="c#"><span class="p">...</span>
+
+  <span class="k">private</span> <span class="k">void</span> <span class="nf">Start</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="c1">//registering the client handler
+</span>    <span class="n">NetworkManager</span><span class="p">.</span><span class="n">singleton</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="nf">RegisterHandler</span> <span class="p">(</span><span class="n">chatMessage</span><span class="p">,</span> <span class="n">ReceiveMessage</span><span class="p">);</span>
+  <span class="p">}</span>
+
+<span class="p">...</span></code></pre></figure>
+
+<p>To send our messages, we need to override the method <em>SendMessage</em>.</p>
+
+<figure class="highlight"><pre><code class="language-c#" data-lang="c#"><span class="p">...</span>
+
+  <span class="k">public</span> <span class="k">override</span> <span class="k">void</span> <span class="nf">SendMessage</span> <span class="p">(</span><span class="n">UnityEngine</span><span class="p">.</span><span class="n">UI</span><span class="p">.</span><span class="n">InputField</span> <span class="n">input</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">StringMessage</span> <span class="n">myMessage</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">StringMessage</span> <span class="p">();</span>
+    <span class="c1">//getting the value of the input
+</span>    <span class="n">myMessage</span><span class="p">.</span><span class="k">value</span> <span class="p">=</span> <span class="n">input</span><span class="p">.</span><span class="n">text</span><span class="p">;</span>
+
+    <span class="c1">//sending to server
+</span>    <span class="n">NetworkManager</span><span class="p">.</span><span class="n">singleton</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="nf">Send</span> <span class="p">(</span><span class="n">chatMessage</span><span class="p">,</span> <span class="n">myMessage</span><span class="p">);</span>
+  <span class="p">}</span>
+
+<span class="p">...</span></code></pre></figure>
+
+<p>Let’s get the text inside the input field and set as value of a new instance of <strong>StringMessage</strong>.</p>
+
+<blockquote>
+  <p>If you want to put more information in the message, you can also create your own message class extending Message Base.</p>
+</blockquote>
+
+<p>Using the method <em>SendMessage</em> of our client, we send the message with the identifier code.</p>
+
+<h3 id="the-server">The server</h3>
+
+<p>Here, I will make server and client in the same script, but you can separate them if you want.</p>
+
+<p>Let’s create a new method to receive client messages in the server and send to other clients.</p>
+
+<figure class="highlight"><pre><code class="language-c#" data-lang="c#"><span class="p">...</span>
+
+  <span class="k">private</span> <span class="k">void</span> <span class="nf">ServerReceiveMessage</span><span class="p">(</span><span class="n">NetworkMessage</span> <span class="n">message</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">StringMessage</span> <span class="n">myMessage</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">StringMessage</span> <span class="p">();</span>
+    <span class="c1">//we are using the connectionId as player name only to exemplify
+</span>    <span class="n">myMessage</span><span class="p">.</span><span class="k">value</span> <span class="p">=</span> <span class="n">message</span><span class="p">.</span><span class="n">conn</span><span class="p">.</span><span class="n">connectionId</span> <span class="p">+</span> <span class="s">": "</span> <span class="p">+</span> <span class="n">message</span><span class="p">.</span><span class="n">ReadMessage</span><span class="p">&lt;</span><span class="n">StringMessage</span><span class="p">&gt;</span> <span class="p">().</span><span class="k">value</span><span class="p">;</span>
+
+    <span class="c1">//sending to all connected clients
+</span>    <span class="n">NetworkServer</span><span class="p">.</span><span class="nf">SendToAll</span> <span class="p">(</span><span class="n">chatMessage</span><span class="p">,</span> <span class="n">myMessage</span><span class="p">);</span>
+  <span class="p">}</span>
+
+<span class="p">...</span></code></pre></figure>
+
+<p>The method creates a new <strong>StringMessage</strong> and set the received string as value, using connection id of the sender client as player name.</p>
+
+<p>We are using the connection id to keep this tutorial simple, but if you want to use nicknames, just send with a custom <strong>NetworkMessage</strong> or create a reference in the server.</p>
+
+<p>At the end, we just send to all clients with <strong>NetworkServer</strong> (You only can use this class on the server).</p>
+
+<p><em>Relax. It is almost ready…</em></p>
+
+<p>Now, we have to add some lines on our <em>Start</em> method.</p>
+
+<figure class="highlight"><pre><code class="language-c#" data-lang="c#"><span class="p">...</span>
+  <span class="p">...</span>
+
+    <span class="c1">//if the client is also the server
+</span>    <span class="k">if</span> <span class="p">(</span><span class="n">NetworkServer</span><span class="p">.</span><span class="n">active</span><span class="p">)</span> 
+    <span class="p">{</span>
+      <span class="c1">//registering the server handler
+</span>      <span class="n">NetworkServer</span><span class="p">.</span><span class="nf">RegisterHandler</span><span class="p">(</span><span class="n">chatMessage</span><span class="p">,</span> <span class="n">ServerReceiveMessage</span><span class="p">);</span>
+    <span class="p">}</span>
+
+  <span class="p">...</span>
+<span class="p">...</span></code></pre></figure>
+
+<p>First, let’s check if this instance is running on server (or host). After that, we just register a new server handler.</p>
+
+<p>Well, it is working. You can test building your project and opening another application.</p>
+
+<h3 id="considerations">Considerations</h3>
+
+<p>I hope this tutorial had helped you.</p>
+
+<p>If you have some question, or found a bug, please, comment below! :D</p>
+
+<p>Full code <a href="https://github.com/frostybay/tutorial-chat">here</a>!</p>
+
+<h3 id="references">References</h3>
+
+<p><a href="https://docs.unity3d.com/ScriptReference/Networking.NetworkServer.html">Unity NetworkServer</a></p>
+
+<p><a href="https://docs.unity3d.com/ScriptReference/Networking.NetworkClient.html">Unity NetworkClient</a></p>
+
+<p><a href="https://docs.unity3d.com/ScriptReference/Networking.MessageBase.html">Unity MessageBase</a></p>
+
+<p><a href="https://docs.unity3d.com/Manual/script-InputField.html">Unity InputField</a></p>
+
+
+  </div>
+
+  <div class="page-navigation">
+	  
+	    <a class="prev" href="/articles/tcp-server-with-nodejs">&laquo; Tutorial: TCP Server with Node.js</a>
+	  
+	  
+	    <a class="next" href="/articles/mvc-boilerplate-express-handlebars-mysql">Express + Handlebars + MySQL boilerplate in MVC pattern &raquo;</a>
+	  
+	</div>
+
+  
+    
+<div id="disqus_thread"></div>
+<script>
+
+var disqus_config = function () {
+    this.page.url = 'http://frostybay.com' + '/articles/a-simple-tutorial-with-unity-unet';  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = '/articles/a-simple-tutorial-with-unity-unet'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+(function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = '//frosty-bay.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+
+  
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Frosty Bay</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Contact</li>
+          <li><a href="mailto:contato@frostybay.com">contato@frostybay.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/frostybay"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">frostybay</span></a>
+
+          </li>
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>Frosty Bay is an indie game development studio based in Itapema, Brazil and this is our website. This is where we put some articles about interesting stuff.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

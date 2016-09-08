@@ -6,9 +6,303 @@
 </description>
     <link>http://frostybay.com/</link>
     <atom:link href="http://frostybay.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 20 Aug 2016 03:20:43 -0300</pubDate>
-    <lastBuildDate>Sat, 20 Aug 2016 03:20:43 -0300</lastBuildDate>
+    <pubDate>Thu, 08 Sep 2016 15:50:43 -0300</pubDate>
+    <lastBuildDate>Thu, 08 Sep 2016 15:50:43 -0300</lastBuildDate>
     <generator>Jekyll v3.2.1</generator>
+    
+      <item>
+        <title>Express + Handlebars + MySQL boilerplate in MVC pattern</title>
+        <description>&lt;p&gt;We’ve just pushed a &lt;a href=&quot;https://github.com/Eitz/express-boilerplate-mvc&quot;&gt;repository&lt;/a&gt; to github containing an Express project in a full MVC pattern.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Model:&lt;/strong&gt; MySQL with simple ORM&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;View:&lt;/strong&gt; Handlebars enabled templates&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Controller:&lt;/strong&gt; Execution time loading controllers for easy usage&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;There are examples of how to use the pattern inside the source code.&lt;/p&gt;
+
+&lt;p&gt;Go ahead and fork the repository &lt;a href=&quot;https://github.com/Eitz/express-boilerplate-mvc&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+</description>
+        <pubDate>Thu, 08 Sep 2016 15:42:58 -0300</pubDate>
+        <link>http://frostybay.com/articles/mvc-boilerplate-express-handlebars-mysql</link>
+        <guid isPermaLink="true">http://frostybay.com/articles/mvc-boilerplate-express-handlebars-mysql</guid>
+        
+        
+        <category>javascript</category>
+        
+        <category>node-js</category>
+        
+        <category>server</category>
+        
+        <category>programming</category>
+        
+        <category>handlebars</category>
+        
+        <category>mysql</category>
+        
+      </item>
+    
+      <item>
+        <title>Tutorial: A simple chat with Unity UNET</title>
+        <description>&lt;h3 id=&quot;description&quot;&gt;Description&lt;/h3&gt;
+
+&lt;p&gt;This tutorial will teach you how to build a simple online chat using Unity UNET system.&lt;/p&gt;
+
+&lt;h3 id=&quot;requirements&quot;&gt;Requirements&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Basic knowledge of Unity Editor.&lt;/li&gt;
+  &lt;li&gt;Basic Knowledge of C#.&lt;/li&gt;
+  &lt;li&gt;Unity3D 5.1 +.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&quot;connection-and-scenes&quot;&gt;Connection and scenes&lt;/h3&gt;
+
+&lt;p&gt;First, we need to create two scenes, online and offline scene.&lt;/p&gt;
+
+&lt;p&gt;After that, drag the scenes to &lt;strong&gt;BuildSettings&lt;/strong&gt; window (File-&amp;gt;Build Settings).&lt;/p&gt;
+
+&lt;p&gt;On the offline scene, create a new empty object and add &lt;strong&gt;NetworkManager&lt;/strong&gt; and &lt;strong&gt;NetworkManagerHUD&lt;/strong&gt; to it.&lt;/p&gt;
+
+&lt;p&gt;Drag our scenes to Offline Scene and Online Scene field on the &lt;strong&gt;NetworkManager&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;Uncheck the box Auto Spawn (Spawn Info -&amp;gt; Auto Spawn) on the &lt;strong&gt;NetworkManager&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;connecting&quot;&gt;Connecting&lt;/h3&gt;
+
+&lt;p&gt;Start the offline scene and press the button called “LANHost” or “LANClient” on top of the screen.&lt;/p&gt;
+
+&lt;p&gt;If you want to connect with &lt;em&gt;Unity Matchmaking&lt;/em&gt;, you need to change some settings before.&lt;/p&gt;
+
+&lt;h3 id=&quot;basic-interface-elements&quot;&gt;Basic interface elements&lt;/h3&gt;
+
+&lt;p&gt;To start coding, we will need some UI elements to our chat.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Text – We show messages here.&lt;/li&gt;
+  &lt;li&gt;Input Field – We will write here.&lt;/li&gt;
+  &lt;li&gt;Button – To send the messages.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;They are basic UI elements. You can create them with left-click on hierarchy window.&lt;/p&gt;
+
+&lt;p&gt;You can also download my prefab for this tutorial &lt;a href=&quot;https://github.com/frostybay/tutorial-chat/tree/master/Assets/Prefabs&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;interface-methods&quot;&gt;Interface methods&lt;/h3&gt;
+
+&lt;p&gt;Create a new script to our chat.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c#&quot; data-lang=&quot;c#&quot;&gt;&lt;span class=&quot;k&quot;&gt;using&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;UnityEngine&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;using&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;UnityEngine.UI&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Chat&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;MonoBehaviour&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;We need import &lt;strong&gt;UnityEngine.UI&lt;/strong&gt; to get access to UI classes.&lt;/p&gt;
+
+&lt;p&gt;Let’s create some properties to our interface elements.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c#&quot; data-lang=&quot;c#&quot;&gt;&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+
+  &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SerializeField&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Text&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;container&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  
+  &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SerializeField&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ScrollRect&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;The “SerializeField” tag force property serialization.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Now, we need a method to add messages to our chat. Let’s create with internal access, because in the future we will override it.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c#&quot; data-lang=&quot;c#&quot;&gt;&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;internal&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;AddMessage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;container&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;\n&quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;We will need also a method to send messages to the server. This method will be just a trigger to our extended class.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c#&quot; data-lang=&quot;c#&quot;&gt;&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;virtual&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;SendMessage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;InputField&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{}&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Attach this method to the event “OnClick” on the button that we have created before.&lt;/p&gt;
+
+&lt;h3 id=&quot;the-client&quot;&gt;The client&lt;/h3&gt;
+
+&lt;p&gt;Create a new script to extend our &lt;strong&gt;Chat&lt;/strong&gt; class.&lt;/p&gt;
+
+&lt;p&gt;Do not forget to import some namespaces to use the &lt;em&gt;UNET&lt;/em&gt;.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c#&quot; data-lang=&quot;c#&quot;&gt;&lt;span class=&quot;k&quot;&gt;using&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;UnityEngine&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;using&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;UnityEngine.Networking&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;using&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;UnityEngine.Networking.NetworkSystem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;UNETChat&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Chat&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;We will define a code to our chat messages.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c#&quot; data-lang=&quot;c#&quot;&gt;&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+
+  &lt;span class=&quot;c1&quot;&gt;//just a random number
+&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;short&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;chatMessage&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;131&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Now, we will create a method to receive our messages. We will receive a &lt;strong&gt;NetworkMessage&lt;/strong&gt; object as a parameter and send to a previously created method on &lt;strong&gt;Chat&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c#&quot; data-lang=&quot;c#&quot;&gt;&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+  
+  &lt;span class=&quot;k&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;ReceiveMessage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NetworkMessage&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;//reading message
+&lt;/span&gt;    &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;text&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ReadMessage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;StringMessage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;nf&quot;&gt;AddMessage&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;On start method (called by unity whenever the scene start), we will register a handle to our client, who can be accessed by the &lt;strong&gt;NetworkManager&lt;/strong&gt; singleton (I can explain singletons in another post). It means that whenever we receive a message with 131 code, we send to the method &lt;em&gt;ReceiveMessage&lt;/em&gt;.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c#&quot; data-lang=&quot;c#&quot;&gt;&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Start&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;//registering the client handler
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;NetworkManager&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;singleton&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;client&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;RegisterHandler&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;chatMessage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ReceiveMessage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;To send our messages, we need to override the method &lt;em&gt;SendMessage&lt;/em&gt;.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c#&quot; data-lang=&quot;c#&quot;&gt;&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;override&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;SendMessage&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;UnityEngine&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;UI&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;InputField&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;StringMessage&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;myMessage&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;StringMessage&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;//getting the value of the input
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;myMessage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;value&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;//sending to server
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;NetworkManager&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;singleton&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;client&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;Send&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;chatMessage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;myMessage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Let’s get the text inside the input field and set as value of a new instance of &lt;strong&gt;StringMessage&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;If you want to put more information in the message, you can also create your own message class extending Message Base.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Using the method &lt;em&gt;SendMessage&lt;/em&gt; of our client, we send the message with the identifier code.&lt;/p&gt;
+
+&lt;h3 id=&quot;the-server&quot;&gt;The server&lt;/h3&gt;
+
+&lt;p&gt;Here, I will make server and client in the same script, but you can separate them if you want.&lt;/p&gt;
+
+&lt;p&gt;Let’s create a new method to receive client messages in the server and send to other clients.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c#&quot; data-lang=&quot;c#&quot;&gt;&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;ServerReceiveMessage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NetworkMessage&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;StringMessage&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;myMessage&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;StringMessage&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;//we are using the connectionId as player name only to exemplify
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;myMessage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;value&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;connectionId&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;: &quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ReadMessage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;StringMessage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;//sending to all connected clients
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;NetworkServer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;SendToAll&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;chatMessage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;myMessage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;The method creates a new &lt;strong&gt;StringMessage&lt;/strong&gt; and set the received string as value, using connection id of the sender client as player name.&lt;/p&gt;
+
+&lt;p&gt;We are using the connection id to keep this tutorial simple, but if you want to use nicknames, just send with a custom &lt;strong&gt;NetworkMessage&lt;/strong&gt; or create a reference in the server.&lt;/p&gt;
+
+&lt;p&gt;At the end, we just send to all clients with &lt;strong&gt;NetworkServer&lt;/strong&gt; (You only can use this class on the server).&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Relax. It is almost ready…&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Now, we have to add some lines on our &lt;em&gt;Start&lt;/em&gt; method.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c#&quot; data-lang=&quot;c#&quot;&gt;&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;//if the client is also the server
+&lt;/span&gt;    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NetworkServer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;active&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; 
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;c1&quot;&gt;//registering the server handler
+&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;NetworkServer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;RegisterHandler&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;chatMessage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ServerReceiveMessage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+  &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;First, let’s check if this instance is running on server (or host). After that, we just register a new server handler.&lt;/p&gt;
+
+&lt;p&gt;Well, it is working. You can test building your project and opening another application.&lt;/p&gt;
+
+&lt;h3 id=&quot;considerations&quot;&gt;Considerations&lt;/h3&gt;
+
+&lt;p&gt;I hope this tutorial had helped you.&lt;/p&gt;
+
+&lt;p&gt;If you have some question, or found a bug, please, comment below! :D&lt;/p&gt;
+
+&lt;p&gt;Full code &lt;a href=&quot;https://github.com/frostybay/tutorial-chat&quot;&gt;here&lt;/a&gt;!&lt;/p&gt;
+
+&lt;h3 id=&quot;references&quot;&gt;References&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://docs.unity3d.com/ScriptReference/Networking.NetworkServer.html&quot;&gt;Unity NetworkServer&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://docs.unity3d.com/ScriptReference/Networking.NetworkClient.html&quot;&gt;Unity NetworkClient&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://docs.unity3d.com/ScriptReference/Networking.MessageBase.html&quot;&gt;Unity MessageBase&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://docs.unity3d.com/Manual/script-InputField.html&quot;&gt;Unity InputField&lt;/a&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Sat, 20 Aug 2016 00:12:30 -0300</pubDate>
+        <link>http://frostybay.com/articles/a-simple-tutorial-with-unity-unet</link>
+        <guid isPermaLink="true">http://frostybay.com/articles/a-simple-tutorial-with-unity-unet</guid>
+        
+        
+        <category>c#</category>
+        
+        <category>unet</category>
+        
+        <category>unity</category>
+        
+        <category>server</category>
+        
+        <category>client</category>
+        
+        <category>chat</category>
+        
+        <category>programming</category>
+        
+      </item>
     
       <item>
         <title>Tutorial: TCP Server with Node.js</title>

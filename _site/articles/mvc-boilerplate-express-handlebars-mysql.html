@@ -6,18 +6,17 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Frosty Bay</title>
+  <title>Express + Handlebars + MySQL boilerplate in MVC pattern</title>
   
-  	<meta name="description" content="Frosty Bay is an indie game development studio based in Itapema, Brazil and this is our website. This is where we put some articles about interesting stuff.
-">
+  	<meta name="description" content="MVC repository with several examples inside">
 	
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://frostybay.com/">
+  <link rel="canonical" href="http://frostybay.com/articles/mvc-boilerplate-express-handlebars-mysql">
   <link rel="alternate" type="application/rss+xml" title="Frosty Bay" href="http://frostybay.com/feed.xml">
 
   
-  	<meta name="og:image" content="http://frostybay.com/img/logo.png" />
+    <meta name="og:image" content="http://frostybay.com/img/posts/cover/node.png" />
   
 
   
@@ -65,62 +64,69 @@
 
     <div class="page-content">
       <div class="wrapper">
-        <div class="home">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
-  <h1 class="page-heading">Articles</h1>
+  
+    <div class="post-cover">
+      <img src="/img/posts/cover/node.png" />    
+    </div>
+  
 
-  <ul class="post-list">
+  <p class="post-back">
+    <a href="/">&laquo; Back to articles </a>
+  </p>
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Express + Handlebars + MySQL boilerplate in MVC pattern</h1>
+    <p class="post-meta"><time datetime="2016-09-08T15:42:58-03:00" itemprop="datePublished">Sep 8, 2016</time> • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Richard Eitz</span></span></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>We’ve just pushed a <a href="https://github.com/Eitz/express-boilerplate-mvc">repository</a> to github containing an Express project in a full MVC pattern.</p>
+
+<ul>
+  <li><strong>Model:</strong> MySQL with simple ORM</li>
+  <li><strong>View:</strong> Handlebars enabled templates</li>
+  <li><strong>Controller:</strong> Execution time loading controllers for easy usage</li>
+</ul>
+
+<p>There are examples of how to use the pattern inside the source code.</p>
+
+<p>Go ahead and fork the repository <a href="https://github.com/Eitz/express-boilerplate-mvc">here</a>.</p>
+
+
+  </div>
+
+  <div class="page-navigation">
+	  
+	    <a class="prev" href="/articles/a-simple-tutorial-with-unity-unet">&laquo; Tutorial: A simple chat with Unity UNET</a>
+	  
+	  
+	</div>
+
+  
     
-      <li>
-        <span class="post-meta"></span>
+<div id="disqus_thread"></div>
+<script>
 
-        <h2>
-          <a class="post-link" href="/articles/mvc-boilerplate-express-handlebars-mysql">Express + Handlebars + MySQL boilerplate in MVC pattern</a>
-          <p class="post-meta">
-            Sep 8, 2016
-            
-              -
-            
-            MVC repository with several examples inside
-          </p>
-        </h2>
-      </li>
-    
-      <li>
-        <span class="post-meta"></span>
+var disqus_config = function () {
+    this.page.url = 'http://frostybay.com' + '/articles/mvc-boilerplate-express-handlebars-mysql';  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = '/articles/mvc-boilerplate-express-handlebars-mysql'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+(function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = '//frosty-bay.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 
-        <h2>
-          <a class="post-link" href="/articles/a-simple-tutorial-with-unity-unet">Tutorial: A simple chat with Unity UNET</a>
-          <p class="post-meta">
-            Aug 20, 2016
-            
-            
-          </p>
-        </h2>
-      </li>
-    
-      <li>
-        <span class="post-meta"></span>
 
-        <h2>
-          <a class="post-link" href="/articles/tcp-server-with-nodejs">Tutorial: TCP Server with Node.js</a>
-          <p class="post-meta">
-            Aug 15, 2016
-            
-              -
-            
-            How to: Setup and configure Node.js TCP server application and more
-          </p>
-        </h2>
-      </li>
-    
-  </ul>
 
-  <!--
-  INACTIVE
-  p class="rss-subscribe">subscribe <a href="/feed.xml">via RSS</a></p -->
+  
 
-</div>
+</article>
 
       </div>
     </div>

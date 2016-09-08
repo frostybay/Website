@@ -10,9 +10,9 @@ description: "MVC repository with several examples inside"
 
 We've just pushed a [repository][repository] to github containing an Express project in a full MVC pattern.
 
-Model: MySQL with simple ORM
-View: Handlebars enabled templates
-Controller: Execution time loading controllers for easy usage
+* **Model:** MySQL with simple ORM
+* **View:** Handlebars enabled templates
+* **Controller:** Execution time loading controllers for easy usage
 
 There are examples of how to use the pattern inside the source code.
 
